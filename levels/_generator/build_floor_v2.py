@@ -97,9 +97,9 @@ def dsize(t): return (.7, 2.25) if t == 'wrong' else (.94, 2.07)
 for num, wf, u, t, _ in L['doors']:
     wd, h = dsize(t); cuts.append(cutter(wf, u - wd / 2, u + wd / 2, TH, h, .3))
 swf, su = L['stair']; cuts.append(cutter(swf, su - .62, su + .62, TH, 2.12, .3))
-lwf, ua, ub = L['lifts']
+lwf, ua, ub = L['lifts']; LHW = .5        # 1.0 m lift doors
 for u in (ua, ub):
-    cuts.append(cutter(lwf, u - .4, u + .4, TH, 2.0, T + .2)); c = bmesh.new(); fbox(c, lwf, (u - .6, -.5, -T), (u + .6, H + .5, -T - 1.6)); cuts.append(c)
+    cuts.append(cutter(lwf, u - LHW, u + LHW, TH, 2.05, T + .2)); c = bmesh.new(); fbox(c, lwf, (u - .82, -.5, -T), (u + .82, H + .5, -T - 1.8)); cuts.append(c)
 for wf, uc, _ in L['windows']: cuts.append(cutter(wf, uc - .6, uc + .6, .9, 2.2, TE + .5))
 boolean_cut(walls, cuts)
 bm = bmesh.new(); bm.from_mesh(walls.data)
@@ -190,12 +190,12 @@ occupy(swf, u0 - .08, u1 + .08, 0, 2.2, 'Door_Stair')
 # ---------------------------------------------------------------- lifts
 f = F(lwf); LIGHTS = []
 for name, u in (('A', ua), ('B', ub)):
-    u0, u1 = u - .4, u + .4; broken = name == 'B'
-    bm = bmesh.new(); casing(bm, lwf, u0, u1, 2.0, a=.12, d=.045); lbox(bm, lwf, u0 - .12, u1 + .12, 2.121, 2.3, 0, .03)
-    make('Lift%s_Portal' % name, bm, 'Lift', [tm('T_LiftDoor_Metal')], origin=f(u, 0, 0)); occupy(lwf, u0 - .12, u1 + .12, 0, 2.3, 'Lift' + name)
+    u0, u1 = u - LHW, u + LHW; broken = name == 'B'
+    bm = bmesh.new(); casing(bm, lwf, u0, u1, 2.05, a=.12, d=.045); lbox(bm, lwf, u0 - .12, u1 + .12, 2.171, 2.35, 0, .03)
+    make('Lift%s_Portal' % name, bm, 'Lift', [tm('T_LiftDoor_Metal')], origin=f(u, 0, 0)); occupy(lwf, u0 - .12, u1 + .12, 0, 2.35, 'Lift' + name)
     gap = .035 if broken else .001
     for side, (a, b, cell) in (('L', (u0 + .004, u - gap, (0, 0, .5, 1))), ('R', (u + gap, u1 - .004, (.5, 0, 1, 1)))):
-        bm = bmesh.new(); caps = prism(bm, lwf, [(a, TH), (b, TH), (b, 1.996), (a, 1.996)], -.10, -.07, 0); leaf_uv(bm, caps, lwf, a, b, TH, 1.996, cell)
+        bm = bmesh.new(); caps = prism(bm, lwf, [(a, TH), (b, TH), (b, 2.046), (a, 2.046)], -.10, -.07, 0); leaf_uv(bm, caps, lwf, a, b, TH, 2.046, cell)
         make('Lift%s_Door_%s' % (name, side), bm, 'Lift', [LIFT], origin=f((a + b) / 2, TH, -.085))
     bu = u1 + .32
     bm = bmesh.new(); lbox(bm, lwf, bu - .045, bu + .045, 1.1, 1.28, 0, .022, 0); cyl(bm, f(bu, 1.17, .022), f(bu, 1.17, .032), .016, 8, 1)
@@ -203,27 +203,27 @@ for name, u in (('A', ua), ('B', ub)):
     make('Lift%s_CallButton' % name, bm, 'Lift', [STEEL, flat('M_Button_Dead', (.25, .04, .03), .5) if broken else glow('M_Button_Red', (1, .08, .03), 3.0), glow('M_Lift_Arrow', (1, .55, .1), 2.0) if not broken else BLACK],
          origin=f(bu, 1.1, 0)); occupy(lwf, bu - .045, bu + .045, 1.1, 1.28, 'Lift%s_Button' % name)
     if not broken:
-        bm = bmesh.new(); fbox(bm, lwf, (u - .6, -.05, -T), (u + .6, 2.25, -T - 1.1)); cab = make('LiftA_Cab', bm, 'Lift', [tm('T_A_VeneerLight'), tm('T_LiftCab_Floor'), STEEL], origin=f(u, 0, -T))
-        c1 = bmesh.new(); fbox(c1, lwf, (u - .55, 0, -T - .05), (u + .55, 2.2, -T - 1.05)); c2 = bmesh.new(); fbox(c2, lwf, (u - .4, 0, -T + .1), (u + .4, 2.0, -T - .2)); boolean_cut(cab, [c1, c2])
+        bm = bmesh.new(); fbox(bm, lwf, (u - .8, -.05, -T), (u + .8, 2.3, -T - 1.4)); cab = make('LiftA_Cab', bm, 'Lift', [tm('T_A_VeneerLight'), tm('T_LiftCab_Floor'), STEEL], origin=f(u, 0, -T))
+        c1 = bmesh.new(); fbox(c1, lwf, (u - .75, 0, -T - .05), (u + .75, 2.25, -T - 1.35)); c2 = bmesh.new(); fbox(c2, lwf, (u - LHW, 0, -T + .1), (u + LHW, 2.05, -T - .2)); boolean_cut(cab, [c1, c2])
         bm = bmesh.new(); bm.from_mesh(cab.data)
         for fc in bm.faces:
             nz_, zc = fc.normal.z, fc.calc_center_median().z
-            fc.material_index = 1 if (nz_ > .9 and abs(zc) < .01) else (2 if (nz_ < -.9 and abs(zc - 2.2) < .01) else 0)
+            fc.material_index = 1 if (nz_ > .9 and abs(zc) < .01) else (2 if (nz_ < -.9 and abs(zc - 2.25) < .01) else 0)
         bm.to_mesh(cab.data); bm.free()
-        bm = bmesh.new(); fbox(bm, lwf, (u - .15, 2.18, -T - .4), (u + .15, 2.2, -T - .7)); make('LiftA_CabLight', bm, 'Lift', [glow('M_LiftCab_Light', (1, .95, .85), 4.0)], origin=f(u, 2.2, -T - .55))
-        bm = bmesh.new(); fbox(bm, lwf, (u + .53, .95, -T - .15), (u + .55, 1.5, -T - .35), 0)
+        bm = bmesh.new(); fbox(bm, lwf, (u - .25, 2.23, -T - .5), (u + .25, 2.25, -T - .9)); make('LiftA_CabLight', bm, 'Lift', [glow('M_LiftCab_Light', (1, .95, .85), 4.0)], origin=f(u, 2.25, -T - .7))
+        bm = bmesh.new(); fbox(bm, lwf, (u + .73, .95, -T - .15), (u + .75, 1.5, -T - .35), 0)
         for i in range(5):
-            for j in range(2): z = 1.0 + i * .09; w = -T - .2 - j * .07; fbox(bm, lwf, (u + .52, z, w), (u + .53, z + .05, w - .035), 2 if (i, j) == (3, 1) else 1)
-        make('LiftA_CabPanel', bm, 'Lift', [STEEL, CREAM, BLACK], origin=f(u + .55, .95, -T - .25))
-        LIGHTS += [('Light_LiftA_Cab', f(u, 2.05, -T - .55), 12, (1, .93, .8)), ('Light_LiftA_Button', f(bu, 1.19, .08), .3, (1, .1, .05))]
-        bm = bmesh.new(); lbox(bm, lwf, u - .12, u + .12, 2.34, 2.46, 0, .04, 0); lbox(bm, lwf, u - .05, u + .05, 2.37, 2.43, .04, .042, 1)
-        make('LiftA_Indicator', bm, 'Lift', [STEEL, glow('M_Lift_Arrow', (1, .55, .1), 2.0)], origin=f(u, 2.34, 0)); occupy(lwf, u - .12, u + .12, 2.34, 2.46, 'Indicator')
+            for j in range(2): z = 1.0 + i * .09; w = -T - .2 - j * .07; fbox(bm, lwf, (u + .72, z, w), (u + .73, z + .05, w - .035), 2 if (i, j) == (3, 1) else 1)
+        make('LiftA_CabPanel', bm, 'Lift', [STEEL, CREAM, BLACK], origin=f(u + .75, .95, -T - .25))
+        LIGHTS += [('Light_LiftA_Cab', f(u, 2.05, -T - .7), 14, (1, .93, .8)), ('Light_LiftA_Button', f(bu, 1.19, .08), .3, (1, .1, .05))]
+        bm = bmesh.new(); lbox(bm, lwf, u - .12, u + .12, 2.38, 2.5, 0, .04, 0); lbox(bm, lwf, u - .05, u + .05, 2.41, 2.47, .04, .042, 1)
+        make('LiftA_Indicator', bm, 'Lift', [STEEL, glow('M_Lift_Arrow', (1, .55, .1), 2.0)], origin=f(u, 2.38, 0)); occupy(lwf, u - .12, u + .12, 2.38, 2.5, 'Indicator')
     else:
-        bm = bmesh.new(); fbox(bm, lwf, (u - .6, -2.5, -T), (u + .6, H + 1, -T - 1.5)); sh = make('LiftB_Shaft', bm, 'Lift', [tm('T_Shaft_Concrete')], origin=f(u, 0, -T))
-        c1 = bmesh.new(); fbox(c1, lwf, (u - .55, -2.45, -T + .01), (u + .55, H + .95, -T - 1.45)); boolean_cut(sh, [c1])
+        bm = bmesh.new(); fbox(bm, lwf, (u - .8, -2.5, -T), (u + .8, H + 1, -T - 1.7)); sh = make('LiftB_Shaft', bm, 'Lift', [tm('T_Shaft_Concrete')], origin=f(u, 0, -T))
+        c1 = bmesh.new(); fbox(c1, lwf, (u - .75, -2.45, -T + .01), (u + .75, H + .95, -T - 1.65)); boolean_cut(sh, [c1])
         bm = bmesh.new()
-        for du in (-.2, 0, .2): cyl(bm, f(u + du, -2.45, -T - .8), f(u + du, H + .95, -T - .8), .012, 6)
-        make('LiftB_Cables', bm, 'Lift', [WIRE], origin=f(u, -2.45, -T - .8))
+        for du in (-.3, 0, .3): cyl(bm, f(u + du, -2.45, -T - .9), f(u + du, H + .95, -T - .9), .012, 6)
+        make('LiftB_Cables', bm, 'Lift', [WIRE], origin=f(u, -2.45, -T - .9))
         bm = bmesh.new(); fs = lbox(bm, lwf, bu + .1, bu + .38, 1.40, 1.68, 0, .002); set_uv(bm, fs, lwf, bu + .1, bu + .38, 1.40, 1.68)
         make('LiftB_Sign', bm, 'Lift', [xm('T_Sign_LiftBroken')], origin=f(bu + .24, 1.4, 0)); occupy(lwf, bu + .1, bu + .38, 1.4, 1.68, 'LiftB_Sign')
 dmx = (ua + ub) / 2
