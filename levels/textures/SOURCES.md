@@ -64,3 +64,44 @@ Unity: Filter Mode = Point, Compression = None, Generate Mip Maps off (or on, fo
 | T_FloorNumber_7.png | 32 | drawn: stencil digit |
 | T_NumberPlates.png | 256x128 | drawn: apartment number plates atlas |
 | T_Sign_LiftBroken.png | 64 | ambientCG Paper001 + drawn text |
+| T_Wall_PaintSkyBlue.png | 128 | Poly Haven blue_plaster_weathered, saturation x0.85 |
+| T_Wall_PaintSkyBlueStripe.png | 64 | Poly Haven blue_plaster_weathered, saturation x0.8, brightness x0.5 |
+| T_Wall_PaintBlueGreyPeeling.png | 128 | ambientCG PaintedPlaster008, saturation x0.6, brightness x1.05 |
+| T_Wall_ConcretePainted.png | 128 | ambientCG Concrete034, saturation x0.5 |
+| T_Wall_ConcreteStained.png | 128 | ambientCG PaintedPlaster015, saturation x0.5 |
+| T_Baseboard_Dark.png | 64 | ambientCG Concrete031, saturation x0.5, brightness x0.6 |
+| T_Floor_Concrete.png | 128 | ambientCG Concrete020, saturation x0.6 |
+| T_Floor_ConcreteWorn.png | 128 | Poly Haven concrete_floor_02, saturation x0.5 |
+| T_Floor_ConcreteLight.png | 128 | ambientCG Concrete036, saturation x0.5 |
+| T_Ceiling_Concrete.png | 128 | ambientCG Concrete034, saturation x0.4, brightness x1.05 |
+| T_Ceiling_ConcreteStained.png | 128 | ambientCG Concrete019, saturation x0.4 |
+| T_Beam_Concrete.png | 64 | ambientCG Concrete015, saturation x0.5, brightness x1.1 |
+| T_Wall_Wallpaper2_M.png | 128 | ShareTextures wallpaper-20, saturation x0.5, brightness x0.95 |
+| T_Door_DermatinBrown_M.png | 64 | T_Door_DermatinBrown.png desaturated (blue/concrete style) |
+| T_Door_DermatinBlack_M.png | 64 | T_Door_DermatinBlack.png desaturated (blue/concrete style) |
+| T_Door_WoodBeige_M.png | 64 | T_Door_WoodBeige.png desaturated (blue/concrete style) |
+| T_Door_WoodBlue_M.png | 64 | T_Door_WoodBlue.png desaturated (blue/concrete style) |
+| T_Door_WoodBrown_M.png | 64 | T_Door_WoodBrown.png desaturated (blue/concrete style) |
+| T_Door_SteelBrown_M.png | 64 | T_Door_SteelBrown.png desaturated (blue/concrete style) |
+| T_Door_SteelGrey_M.png | 64 | T_Door_SteelGrey.png desaturated (blue/concrete style) |
+| T_Door_StairWood_M.png | 64 | T_Door_StairWood.png desaturated (blue/concrete style) |
+| T_Wood_Frame_M.png | 64 | T_Wood_Frame.png desaturated (blue/concrete style) |
+| T_Partition_Wood_M.png | 64 | T_Partition_Wood.png desaturated (blue/concrete style) |
+| T_Partition_Door_M.png | 64 | T_Partition_Door.png desaturated (blue/concrete style) |
+| T_Metal_Grille_M.png | 64 | T_Metal_Grille.png desaturated (blue/concrete style) |
+| T_Mailbox_M.png | 64 | T_Mailbox.png desaturated (blue/concrete style) |
+| T_FireCabinet_M.png | 64 | T_FireCabinet.png desaturated (blue/concrete style) |
+| T_ElectricPanel_M.png | 64 | T_ElectricPanel.png desaturated (blue/concrete style) |
+| T_Chute_Hatch_M.png | 64 | T_Chute_Hatch.png desaturated (blue/concrete style) |
+| T_Radiator_M.png | 64 | T_Radiator.png desaturated (blue/concrete style) |
+| T_Furniture_Wood_M.png | 64 | T_Furniture_Wood.png desaturated (blue/concrete style) |
+| T_Chair_Wood_M.png | 64 | T_Chair_Wood.png desaturated (blue/concrete style) |
+| T_Sled_Wood_M.png | 64 | T_Sled_Wood.png desaturated (blue/concrete style) |
+| T_Cardboard_M.png | 64 | T_Cardboard.png desaturated (blue/concrete style) |
+| T_Carpet_Runner_M.png | 64 | T_Carpet_Runner.png desaturated (blue/concrete style) |
+| T_Carpet_Rolled_M.png | 64 | T_Carpet_Rolled.png desaturated (blue/concrete style) |
+| T_Mat_Olive_M.png | 64 | T_Mat_Olive.png desaturated (blue/concrete style) |
+| T_Mat_Blue_M.png | 64 | T_Mat_Blue.png desaturated (blue/concrete style) |
+| T_Wall_Vagonka_M.png | 64 | T_Wall_Vagonka.png desaturated (blue/concrete style) |
+| T_LiftCab_Wood_M.png | 64 | T_LiftCab_Wood.png desaturated (blue/concrete style) |
+| T_Bucket_M.png | 64 | T_Bucket.png desaturated (blue/concrete style) |
