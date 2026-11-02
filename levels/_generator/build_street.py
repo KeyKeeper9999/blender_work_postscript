@@ -31,7 +31,7 @@ def tf(org, rot):
 
 # ---------------------------------------------------------------- materials
 E = {k: tm('T_Ext_' + k) for k in ('Panel_A', 'Panel_B', 'Panel_C', 'Seam', 'Plinth', 'Road', 'Sidewalk', 'Curb', 'Lawn', 'Mud',
-                                   'LeafClump', 'Sand', 'BarkPoplar', 'BarkBirch', 'GarageWall', 'GarageDoor', 'BrickWhite', 'BrickRed',
+                                   'LeafClump', 'Sand', 'BarkPoplar', 'BarkBirch', 'GarageWall', 'GarageDoor', 'BrickRed',
                                    'Rust', 'PaintOrange', 'PaintBlue', 'PaintRed', 'CarPaintA',
                                    'CarPaintB', 'Pole', 'Roof', 'BgPanels')}
 def glow(name, c, s): return mat(name, color=c, emit=(c, s), rough=.3)
@@ -395,6 +395,8 @@ for o in dst.objects:
     o.location, o.rotation_euler, o.scale = (0, 0, 0), (0, 0, 0), (1, 1, 1)
     o.data.transform(Matrix.Translation((80, -45, 0))); o.data.materials.clear(); o.data.materials.append(E['BgPanels'])
     o.name = 'Bg_' + o.name; col('Background').objects.link(o)
+for m in [m for m in bpy.data.materials if m.name.startswith('lod')]: bpy.data.materials.remove(m)       # keep only our 256 px copy
+for im in [i for i in bpy.data.images if i.name.startswith('lod')]: bpy.data.images.remove(im)
 def far_block(name, x0, y0, x1, y1, floors, seed):
     """distant panel block: dark body + only the lit windows as thin boxes"""
     r = random.Random(seed); hgt = .9 + floors * 2.8 + .7

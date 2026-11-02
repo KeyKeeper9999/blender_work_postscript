@@ -121,7 +121,6 @@ Unity: Filter Mode = Point, Compression = None, Generate Mip Maps off (or on, fo
 | T_Ext_BarkBirch.png | 64 | ambientCG Bark009, saturation x0.6 |
 | T_Ext_GarageWall.png | 128 | ambientCG CorrugatedSteel007B, saturation x0.55 |
 | T_Ext_GarageDoor.png | 64 | ambientCG CorrugatedSteel005, saturation x0.6 |
-| T_Ext_BrickWhite.png | 128 | ambientCG Bricks024, saturation x0.6 |
 | T_Ext_BrickRed.png | 64 | ambientCG Bricks025, saturation x0.55 |
 | T_Ext_Curtain_1.png | 64 | ambientCG Fabric008, saturation x0.8 |
 | T_Ext_Curtain_2.png | 64 | ambientCG Fabric009, saturation x0.8 |
