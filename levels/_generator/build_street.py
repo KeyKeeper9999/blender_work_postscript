@@ -236,9 +236,11 @@ TA, PA, WA, ENTA = building('BuildingA', (0, 0), 0, ['win', 'balc', 'ent', 'win'
                             9, 2.8, .9, ['dead', 'lit', 'flicker'], seed=3)
 TB, PB, WB, ENTB = building('BuildingB', (-6, -50), 90, ['win', 'balc', 'win', 'ent', 'win', 'balc', 'balc', 'win', 'ent', 'win', 'balc', 'win'],
                             5, 2.7, .6, ['lit', 'dead'], roofrooms=False, seed=11)
-EW_ = lambda u, z, w: (45 + w, u, z)       # east end wall of A, seen from the yard
-bm = bmesh.new(); fs = lbox(bm, EW_, 4.75, 7.25, 17.85, 20.35, 0, .004); set_uv(bm, fs, EW_, 4.75, 7.25, 17.85, 20.35)
-make('BuildingA_EndNumber', bm, 'BuildingA', [M2['bignum']], origin=(45, 6, 17.85))
+EW_ = lambda u, z, w: (45 + w, u, z)       # east end wall of A, seen from the yard (single quad: alpha decal)
+bm = bmesh.new(); fs = quad(bm, [EW_(4.75, 17.85, .004), EW_(7.25, 17.85, .004), EW_(7.25, 20.35, .004), EW_(4.75, 20.35, .004)], 0); fs.normal_update()
+if fs.normal.x < 0: fs.normal_flip()
+set_uv(bm, fs, EW_, 4.75, 7.25, 17.85, 20.35)
+make('BuildingA_EndNumber', bm, 'BuildingA', [M2['bignum']], origin=(45, 6, 17.85), recalc=False)
 
 # ================================================================ ground, road, sidewalks
 bm = bmesh.new(); wbox(bm, (-70, -120, -.1), (120, 40, -.05)); make('Ground', bm, 'Street', [E['Lawn']])

@@ -166,3 +166,89 @@ Unity: Filter Mode = Point, Compression = None, Generate Mip Maps off (or on, fo
 | T_NumberPlates_Floor_Corner_Blue.png | 256x128 | drawn: apartment number plates for Floor_Corner_Blue (written by build_level.py) |
 | T_NumberPlates_Floor_Corridor_Blue.png | 256x128 | drawn: apartment number plates for Floor_Corridor_Blue (written by build_level.py) |
 | T_NumberPlates_Floor_Ring_Blue.png | 256x128 | drawn: apartment number plates for Floor_Ring_Blue (written by build_level.py) |
+| T_IW_Ochre_A.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IW_Ochre_B.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IW_Ochre_C.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IF_Ochre.png | 256x256 | drawn metlakh checker tiles (16px tiles) on ambientCG Concrete015 grain |
+| T_IC_Ochre.png | 128x128 | ambientCG Plaster002 graded |
+| T_IDoors_Ochre.png | 512x128 | drawn door leaves for Ochre: CC0 leather/paint/wood grain + quilting, panels, rivets, wear |
+| T_ILift_Ochre.png | 128x128 | cgbookcase PaintedMetal01 + drawn scratched tags, rubber edge, kick marks |
+| T_IW_Mint_A.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IW_Mint_B.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IW_Mint_C.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IF_Mint.png | 256x256 | ambientCG Terrazzo005 graded + drawn brass dividers |
+| T_IC_Mint.png | 128x128 | ambientCG Plaster002 graded |
+| T_IDoors_Mint.png | 512x128 | drawn door leaves for Mint: CC0 leather/paint/wood grain + quilting, panels, rivets, wear |
+| T_ILift_Mint.png | 128x128 | cgbookcase PaintedMetal01 + drawn scratched tags, rubber edge, kick marks |
+| T_IW_Panel80_A.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IW_Panel80_B.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IW_Panel80_C.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IF_Panel80.png | 256x256 | ambientCG WoodFloor019 graded flat (printed linoleum) |
+| T_IC_Panel80.png | 128x128 | ambientCG Plaster002 graded |
+| T_IDoors_Panel80.png | 512x128 | drawn door leaves for Panel80: CC0 leather/paint/wood grain + quilting, panels, rivets, wear |
+| T_ILift_Panel80.png | 128x128 | cgbookcase PaintedMetal01 + drawn scratched tags, rubber edge, kick marks |
+| T_IW_Decay_A.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IW_Decay_B.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IW_Decay_C.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_IF_Decay.png | 256x256 | Poly Haven concrete_floor_02 graded, large-scale stains |
+| T_IC_Decay.png | 128x128 | ambientCG Plaster002 graded |
+| T_IDoors_Decay.png | 512x128 | drawn door leaves for Decay: CC0 leather/paint/wood grain + quilting, panels, rivets, wear |
+| T_ILift_Decay.png | 128x128 | cgbookcase PaintedMetal01 + drawn scratched tags, rubber edge, kick marks |
+| T_IP_Mailbox.png | 128x64 | ambientCG PaintedMetal007 + drawn little doors, numbers, slots, letters sticking out |
+| T_IP_Shield.png | 64x128 | ambientCG PaintedMetal006 + drawn warning sign, stencil, lock, scribbles, rust |
+| T_IP_FireCab.png | 64x64 | ambientCG PaintedMetal004 + drawn window, hose, label |
+| T_IP_MatRag.png | 64x32 | drawn braided rag rug |
+| T_IP_MatRubber.png | 64x32 | ambientCG Rubber004 + drawn holes |
+| T_IP_Leaves.png | 64x64 | drawn rubber-plant leaves (alpha card) |
+| T_ID_EdgeGrime.png | 64x64 | drawn dirt gradient along the skirting (fake AO) |
+| T_ID_CornerShadow.png | 64x64 | drawn ceiling-corner shadow gradient (fake AO) |
+| T_ID_WaterStain.png | 128x128 | drawn water leak stain with tide-mark rims |
+| T_ID_Scuffs.png | 128x64 | drawn shoe and bag scuffs |
+| T_ID_Scribbles.png | 128x128 | drawn pen scribbles, kids drawing, phone number, tally marks |
+| T_ID_PathWear.png | 64x128 | drawn worn traffic path |
+| T_ID_MissingTiles.png | 128x128 | drawn cement bed where floor tiles fell out |
+| T_ID_Footprints.png | 64x128 | drawn muddy shoe prints |
+| T_ID_Mold.png | 128x128 | drawn black mould |
+| T_ID_Soot.png | 64x64 | drawn soot above a lamp / burn |
+| T_ID_Debris.png | 128x128 | drawn fallen plaster chunks and dust |
+| T_ID_Flyers.png | 128x128 | drawn trampled flyers |
+| T_ID_Crack.png | 128x128 | drawn plaster crack |
+| T_AW_Damask.png | 256x256 | drawn wallpaper (damask) on ambientCG Paper001 grain, strips, fading, dirt |
+| T_AW_Flowers.png | 256x256 | drawn wallpaper (flowers) on ambientCG Paper001 grain, strips, fading, dirt |
+| T_AW_Stripes.png | 256x256 | drawn wallpaper (stripes) on ambientCG Paper001 grain, strips, fading, dirt |
+| T_AW_Geo.png | 256x256 | drawn wallpaper (geo) on ambientCG Paper001 grain, strips, fading, dirt |
+| T_AW_Stripped.png | 256x256 | drawn torn wallpaper over newspaper and concrete (damask) on ambientCG Paper001 grain, strips, fading, dirt |
+| T_AW_Kitchen_A.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_AW_Bath_A.png | 256x256 | painted wall 4 m x 2.6 m: CC0 plaster/paint photo grain + drawn edge, drips, chips, scuffs |
+| T_AF_Parquet.png | 256x256 | ambientCG WoodFloor034 herringbone graded |
+| T_AF_KitchenLino.png | 256x256 | drawn checker linoleum print (16px tiles) on ambientCG linoleum_brown grain |
+| T_AF_BathTile.png | 256x256 | drawn small bathroom floor tiles (8px tiles) on ambientCG Concrete015 grain |
+| T_AF_Concrete.png | 256x256 | ambientCG Concrete020 graded |
+| T_AC_Ceiling.png | 128x128 | ambientCG Plaster002 graded |
+| T_A_VeneerDark.png | 64x64 | Wood030 graded |
+| T_A_VeneerLight.png | 64x64 | Wood030 graded |
+| T_A_Sofa.png | 64x64 | Fabric026 graded |
+| T_A_Armchair.png | 64x64 | Fabric025 graded |
+| T_A_Enamel.png | 64x64 | Plaster001 graded |
+| T_A_Sheet.png | 64x64 | Fabric019 graded |
+| T_A_Carpet.png | 128x256 | drawn ornamental wall carpet, ambientCG Fabric026 weave |
+| T_A_Rug.png | 128x128 | drawn floor rug, ambientCG Fabric026 weave |
+| T_A_Curtain.png | 64x128 | drawn 70s curtain with fold shading |
+| T_A_Tulle.png | 64x64 | drawn lace tulle (alpha) |
+| T_A_Newspaper.png | 128x128 | drawn fictional newspaper on ambientCG Paper001 |
+| T_A_Envelope.png | 64x32 | drawn envelope with stamp and postmark |
+| T_A_StenkaGlass.png | 64x128 | drawn display cabinet: plates, crystal, boxes behind glass |
+| T_A_Books.png | 64x64 | drawn book spines |
+| T_A_TV.png | 64x64 | drawn CRT TV front |
+| T_A_Stove.png | 64x64 | drawn gas stove front on ambientCG Plaster001 |
+| T_A_Fridge.png | 64x128 | drawn fridge front with magnets and a note |
+| T_A_Oilcloth.png | 64x64 | drawn oilcloth |
+| T_A_Painting.png | 64x64 | drawn framed landscape painting |
+| T_A_Clock.png | 32x32 | drawn wall clock |
+| T_A_Calendar.png | 64x32 | drawn calendar grid (one day circled) |
+| T_A_Doors.png | 128x128 | drawn interior doors: frosted glass panel door and flush door |
+| T_A_Backsplash.png | 64x32 | drawn white kitchen tiles with grease |
+| T_NumberPlates_Floor_Decay_Corridor.png | 256x128 | drawn: apartment number plates for Floor_Decay_Corridor (written by build_floor_v2.py) |
+| T_NumberPlates_Floor_Mint_Ring.png | 256x128 | drawn: apartment number plates for Floor_Mint_Ring (written by build_floor_v2.py) |
+| T_NumberPlates_Floor_Ochre_Landing.png | 256x128 | drawn: apartment number plates for Floor_Ochre_Landing (written by build_floor_v2.py) |
+| T_NumberPlates_Floor_Panel80_Corner.png | 256x128 | drawn: apartment number plates for Floor_Panel80_Corner (written by build_floor_v2.py) |
