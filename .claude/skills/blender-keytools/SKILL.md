@@ -1,0 +1,121 @@
+---
+name: blender-keytools
+description: Use for any work in Key's Blender through the Blender MCP tools (modeling, geometry/shader nodes, materials, textures, UV, baking, bone/object animation, checks, export to Unity). Loads the keytools helper module so checks and repeated actions run as one short call instead of hand-written code or screenshots.
+---
+
+# Blender work with keytools
+
+Key's stack: Blender 5.2, Unity 6.3 URP. 1 Blender unit = 1 m. Answer Key in Russian; names in the file in English.
+
+## 1. Start of every Blender session
+
+Run once (execute_blender_code). Every later call starts with `import keytools as kt`.
+
+```python
+import sys, bpy, importlib
+p = bpy.utils.user_resource('SCRIPTS', path="modules")
+if p not in sys.path: sys.path.append(p)
+try:
+    import keytools as kt; importlib.reload(kt); result = {"kt": kt.VERSION}
+except ImportError:
+    result = {"missing": p}
+```
+
+If missing, or `kt.VERSION` is lower than the version in `keytools.py` next to this SKILL.md: ask Key to copy `keytools.py` from the blender-keytools skill zip into `<p>` (shown in the result) and say "готово" - this costs nothing. Only if Key asks you to do it yourself: read that file and write it to `<p>/keytools.py` with one execute_blender_code call (`open(path, "w", encoding="utf-8").write(<repr of source>)`, ~20k tokens), then import again.
+
+If Blender is not reachable (port 9876), ask Key to open Blender with the MCP add-on server started.
+
+### Headless mode (cloud VM, no Blender MCP tools)
+When there are no Blender MCP tools (e.g. a Claude Code cloud session on a repo):
+- `pip install --break-system-packages bpy==5.2.*` (needs Python 3.13), then run scripts with `python3 script.py`; `keytools.py` from this skill folder is imported directly (`sys.path.insert(0, <skill dir>)`).
+- Open/save the repo's file: `bpy.ops.wm.open_mainfile(filepath=...)` ... `bpy.ops.wm.save_mainfile()`. Never overwrite a file Key did not ask to change: save as a new .blend.
+- One script per step: build + `kt.check_all` + save in the same run, print only short reports.
+- Visual check instead of viewport: small Cycles render (scene camera or a temp camera, 640px, 16 samples, CPU) to PNG, then Read the PNG. `focus` and `contact_sheet` are UI only.
+- Finish with git commit + push so Key pulls the .blend; say which file and what changed.
+
+## 2. Rules for spending fewer tokens
+
+- Facts from text, not pictures: `kt.report(sel)` for sizes/positions/pivots/modifiers, `kt.nodes(name)` for node trees and GN modifier values. Do not screenshot the node editor or outliner to read values.
+- Always return one short string: `result = {"r": kt.check_all("Kitchen")}`. Never return vertex lists or full scene dumps.
+- Batch work: build several objects + run checks in one call, not one call per object.
+- Screenshot only for final visual judgement: `kt.focus(sel, "MATERIAL")`, then get_screenshot_of_area_as_image("VIEW_3D", size_limit_in_bytes=300000). No separate render previews.
+- Do not re-read SKILL.md, animation.md or keytools.py later in the same chat.
+
+## 3. Key's quality rules (check before saying "done")
+
+- Nothing floats unless intended, no z-fighting, no garbage faces inside, objects logically separate, pivots of moving parts on their rotation/movement axis.
+- Do not touch the original if the task is not to change it: work on a copy (`o.copy()` + `o.data.copy()`), new collection.
+- After every modeling step: `kt.check_all(<changed objects or collection>)`. Fix with the action functions, check again, then one screenshot.
+- Intentionally hanging things (lamp on a wire, sign): pass them in `anchors=` or `ignore=`; second floor etc.: `ground=<z>` or `anchors=["Floor_2"]`.
+
+## 4. keytools API (sel = None/all visible | "selected" | name | collection | glob | list)
+
+Read-only:
+- `report(sel)` - per object: tris, dims, location, `origin[x:mid y:mid z:min]`, unapplied scale/rot, shared mesh, mods, mats.
+- `pivot(sel)` - where the origin sits in each object's bbox.
+- `check_all(sel, ground=0, anchors=(), ignore=())` - all checks below, prints only problems or "ALL OK".
+- `check_transforms(sel)` - unapplied / negative scale.
+- `check_mesh(sel, merge=1e-4)` - loose verts/edges, doubles, duplicate & interior faces, >2-face edges, flipped neighbours, inside-out closed meshes, zero-area faces.
+- `check_floating(sel, ground=0, tol=0.001, anchors, ignore)` - groups not connected by contact to ground/anchors, with gap and what is below.
+- `check_zfight(sel, tol=0.001, opposite=False)` - coplanar overlapping same-facing faces between/inside objects (evaluated meshes, modifiers included).
+- `nodes(target, full=False)` - node group / material / object (GN modifiers + input values + materials) as text; non-default values only.
+
+Textures / materials:
+- `check_textures(sel, max_size=2048)` - every image used: size, file/packed/generated, color space, what it feeds; flags MISSING FILE, NPOT, oversize, sRGB on data maps, objects without UV/material.
+- `pbr_material(name, folder=None, files=None, sel=None, prefix=None, uv_scale=1, normal_strength=1, height=False, ao_multiply=False, replace=False)` - Principled material from a texture set; maps auto-detected by file name (basecolor/albedo, normal, roughness, gloss->inverted, metallic, ao, height, opacity, emission, arm/orm). DX normals (dx in name) get green inverted. Assigns to sel.
+- `assign_material(sel, mat, mode="replace"|"append")`.
+- `resize_images(target, max_size=1024, pot=False, suffix=True)` - downscale; saves `<file>_<max>.<ext>` next to the original and relinks (original untouched); packed images repacked. target = image names, objects sel, or None (all used).
+- `relink_images(folder)` - find missing files by name in a folder tree.
+- `pack_metal_smooth(out_path, metal=None, rough=None, metal_ch=0, rough_ch=0, gloss=False)` - Unity URP Lit Metallic Map (RGB metallic, A smoothness = 1-roughness). For arm/orm: rough_ch=1, metal_ch=2.
+
+UV:
+- `check_uv(sel, tex_size=1024)` - UV maps (* = active), texel density px/m, % outside 0-1, overlap % (<1% = raster noise), fill %. Overlap 100% is normal for tiling/box UV, must be ~0 for baking and lightmaps.
+- `uv_box(sel, size=1.0, layer=None, world=True)` - box projection, 1 tile = size m, world-aligned so walls/floors of a modular kit tile seamlessly; upright, not mirrored. Best default for architecture with tiling textures.
+- `uv_unwrap(sel, method, angle=66, margin=0.01, layer=None, size=1)` - "smart" | "unwrap" (seams) | "cube" | "lightmap". Unity lightmap UV = 2nd channel: `uv_unwrap(sel, "lightmap", layer="Lightmap")` (or Unity's Generate Lightmap UVs on import instead).
+
+Bake (Cycles, engine/samples restored afterwards):
+- `bake(sel, maps=("DIFFUSE",), size=1024, out_dir="//baked", margin=8, uv=None, samples=16, source=None, extrusion=0.02, max_ray=0, make_material=False)` - PNG per map `<obj>_<MAP>.png`. Maps: DIFFUSE (color only), NORMAL, ROUGHNESS, AO, EMIT, COMBINED. `source=` high-poly objects -> selected-to-active (normal bake hi->low). Needs non-overlapping UV (`uv=` name). make_material builds and assigns `<obj>_Baked` (use on a copy). Metallic has no bake type: use the source map or pack_metal_smooth.
+
+Animation (rig = armature or any object; bone "" / None = the object itself). Before planning or changing motion, read `animation.md` next to this file (once per chat): principles, timing, recipes.
+- `anim_report(rig)` - fps/range, action + slot, per bone: channels, key frames, interpolation, modifiers, NLA.
+- `keys(rig, bones=None, frames=None)` - key values (euler in degrees). `pose_at(rig, frame, bones)` - local loc/rot/scale + world head.
+- `key_pose(rig, frame, {"Bone": {"loc":..., "rot": (x,y,z) deg, "scale":...}}, interp=None, relative=False)` - set + key; converts to the bone's rotation mode, keeps rotation continuous.
+- `squash_stretch(rig, bone, frame, factor, axis="Y")` - volume-preserving scale key.
+- `move_keys(rig, offset=0, scale=1, pivot=None, bones, frames, snap=True)` - shift / retime (overlap offsets, faster/slower).
+- `copy_keys(src, dst=None, bones, bone_map, frames, offset, mirror=False)` - copy between bones/objects; mirror = .L<->.R with X flip; warns on rotation mode mismatch.
+- `set_interp(rig, "BEZIER"|"LINEAR"|"CONSTANT"|"BACK"..., easing, handles="VECTOR"|"AUTO_CLAMPED"..., bones, frames)`.
+- `cycle(rig, bones, end=None)` - Cycles modifier, optional end key = first key. `set_range(start, end, fps)`.
+- `dup_action(rig)` - work on a copy of the action (original kept with fake user).
+- `bake_anim(rig, start, end, step=1, visual=True)` - constraints/IK -> plain keys in a new action.
+- `motion(rig, bone, start, end, step, point="head"|"tail")` - world path per frame, speed, turn angle (arcs/spacing as text).
+- `anim_check(rig, ground=None, feet=())` - quaternion flips, euler jumps, sub-frame keys, scale<=0, feet below ground.
+- `contact_sheet(path, frames, cols=4)` - UI only: several frames tiled into one PNG, shown in an open Image Editor -> one screenshot instead of many.
+
+Modify (only on what the task is about):
+- `set_origin(sel, where)` - "bottom" | "center" | "top" | "cursor" | (fx,fy,fz) fractions of own bbox (door hinge on left edge: (0, .5, .5)) | world Vector. Mesh stays in place, children kept.
+- `drop(sel, onto=None, gap=0)` - lower objects onto the surface below.
+- `apply_transforms(sel, location=False, rotation=True, scale=True)`.
+- `clean_mesh(sel, merge=1e-4, loose=True, normals=True, interior=False)` - merge doubles, remove loose, recalc normals; interior=True deletes interior faces.
+- `set_input(obj, "Input Name", value, modifier=None)` - GN modifier input by visible name.
+- `bake_shapekeys(obj, "Input Name", [v0, v1, ...])` - new object `<obj>_Baked` with one shape key per value (first = Basis). For Unity morphs / 4D rotation frames; fails if vertex count changes.
+- `export_fbx(sel, path, anim=False, **overrides)` - FBX for Unity (anim=True: all actions + NLA strips as clips): selected only, Scale 1, Apply Scalings FBX All, -Z forward / Y up, Apply Transform off, modifiers on, smoothing Face, no leaf bones.
+- `focus(sel, shading)` - frame objects + set shading (UI only).
+
+Not covered -> write normal bpy/bmesh code in the same call.
+
+## 5. Known gotchas (Blender 5.x)
+
+- GN modifier inputs are no longer `mod["Socket_2"]`: use `mod.properties.inputs.Socket_2.value` (kt.set_input does this).
+- GN group input defaults: set `interface` socket `default_value` (Distance = 3, W Size = 1 in the 4D groups), not a Default Attribute - otherwise objects collapse.
+- New shape keys are created with value 1.0 - set `.value = 0` (bake_shapekeys does).
+- `Material.use_nodes` is deprecated; materials always have `node_tree`.
+- Unity blends shape keys linearly: rotation-like motion needs several in-between keys (8-12).
+- Negative scale flips normals in Unity - apply it and run check_mesh.
+- Morphing for Unity needs identical topology (Shrinkwrap -> Save as Shape Key, or sculpt without Dyntopo).
+- Normal maps: Blender and Unity use OpenGL (Y+). DirectX maps: pbr_material inverts green in Blender; in Unity tick Flip Green Channel in the texture import settings.
+- Data maps (normal, roughness, metallic, AO, mask) = Non-Color in Blender and sRGB off in Unity; Normal maps in Unity: Texture Type = Normal map.
+- Unity URP Lit has no roughness slot: smoothness lives in the Metallic map alpha (Source = Metallic Alpha) -> pack_metal_smooth.
+- Baked/resized images live only in memory until saved: the kt functions save them, raw bpy code must call image.save().
+- An RNA pointer to a UV layer is invalid after switching Edit/Object mode - look it up again by name.
+- Actions are slotted (4.4+): F-curves are in a channelbag, not `action.fcurves` (removed). Use `bpy_extras.anim_utils.action_get_channelbag_for_slot(action, anim_data.action_slot)` or `action.fcurve_ensure_for_datablock(obj, data_path, index=...)`.
+- `ActionSlot` has `name_display` / `identifier`, not `.name`.
