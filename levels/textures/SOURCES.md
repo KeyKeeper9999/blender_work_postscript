@@ -110,12 +110,7 @@ Unity: Filter Mode = Point, Compression = None, Generate Mip Maps off (or on, fo
 | T_Ext_Panel_C.png | 128 | ambientCG Concrete016, saturation x0.5, brightness x1.15 |
 | T_Ext_Seam.png | 64 | ambientCG Concrete031, saturation x0.5, brightness x0.4 |
 | T_Ext_Plinth.png | 128 | ambientCG Concrete032, saturation x0.5 |
-| T_Ext_Road.png | 128 | ambientCG Asphalt025A, saturation x0.6 |
-| T_Ext_Sidewalk.png | 128 | ambientCG Asphalt021, saturation x0.6 |
 | T_Ext_Curb.png | 64 | ambientCG Concrete015, saturation x0.5, brightness x1.1 |
-| T_Ext_Lawn.png | 128 | Poly Haven brown_mud_leaves_01, saturation x0.75 |
-| T_Ext_Mud.png | 128 | ambientCG Ground048, saturation x0.7 |
-| T_Ext_LeafClump.png | 64 | Poly Haven forest_leaves_03, saturation x0.7 |
 | T_Ext_Sand.png | 64 | ambientCG Ground033, saturation x0.6, brightness x0.9 |
 | T_Ext_BarkPoplar.png | 64 | ambientCG Bark001, saturation x0.6 |
 | T_Ext_BarkBirch.png | 64 | ambientCG Bark009, saturation x0.6 |
@@ -130,9 +125,44 @@ Unity: Filter Mode = Point, Compression = None, Generate Mip Maps off (or on, fo
 | T_Ext_PaintOrange.png | 64 | ambientCG PaintedMetal008, saturation x0.5 |
 | T_Ext_PaintBlue.png | 64 | ambientCG PaintedMetal007, saturation x0.5 |
 | T_Ext_PaintRed.png | 64 | ambientCG PaintedMetal004, saturation x0.45, brightness x0.9 |
-| T_Ext_CarPaintA.png | 64 | ambientCG PaintedMetal002, saturation x0.35, brightness x0.8 |
-| T_Ext_CarPaintB.png | 64 | ambientCG PaintedMetal010, saturation x0.4, brightness x0.85 |
 | T_Ext_Pole.png | 64 | ambientCG Concrete015, saturation x0.4, brightness x1.15 |
 | T_Ext_Roof.png | 64 | ambientCG Asphalt026A, saturation x0.5 |
 | T_Ext_HouseNumber.png | 64x32 | drawn: house number plate |
 | T_Ext_BgPanels.png | 256 | lod.png from Key's Panels2.blend (background panel blocks), downscaled and darkened for night |
+| T_Car_Sedan_White.png | 256x256 | drawn car atlas (sedan): paint + panel lines/glass/lights drawn, rust from ambientCG Rust004 |
+| T_Car_Sedan_Blue.png | 256x256 | drawn car atlas (sedan): paint + panel lines/glass/lights drawn, rust from ambientCG Rust004 |
+| T_Car_Sedan_Cherry.png | 256x256 | drawn car atlas (sedan): paint + panel lines/glass/lights drawn, rust from ambientCG Rust004 |
+| T_Car_Wagon_Olive.png | 256x256 | drawn car atlas (wagon): paint + panel lines/glass/lights drawn, rust from ambientCG Rust004 |
+| T_Car_Sedan_Wreck.png | 256x256 | drawn car atlas (sedan): paint + panel lines/glass/lights drawn, rust from ambientCG Rust004 |
+| T_Car_Wheel.png | 128x64 | drawn wheel: tread from ambientCG Rubber004, rim from Metal009, hubcap drawn |
+| T_Car_Plates.png | 128x64 | drawn licence plates (fictional numbers) |
+| T_Decal_Puddle_1.png | 128x128 | drawn puddle decal (water + wet rim, alpha edges) |
+| T_Decal_Puddle_2.png | 128x128 | drawn puddle decal (water + wet rim, alpha edges) |
+| T_Decal_Cracks.png | 256x256 | drawn asphalt cracks |
+| T_Decal_OilStain.png | 64x64 | drawn oil stain |
+| T_Decal_Leaves.png | 128x128 | ambientCG ScatteredLeaves006, alpha from luminance |
+| T_Decal_LeafPile.png | 128x128 | ambientCG ScatteredLeaves004, alpha from luminance |
+| T_Decal_AsphaltPatch.png | 128x128 | ambientCG Asphalt026A, jagged alpha edge |
+| T_Decal_GroundMoss.png | 128x128 | ambientCG Ground037, blob alpha |
+| T_Decal_GroundDryGrass.png | 128x128 | ambientCG Ground068, blob alpha |
+| T_Decal_GroundLeaves.png | 128x128 | Poly Haven dry_decay_leaves, blob alpha |
+| T_Decal_GroundMud.png | 128x128 | Poly Haven brown_mud_02, blob alpha |
+| T_Decal_MudArea.png | 256x256 | ambientCG Ground048 tiled 4x, soft blob alpha |
+| T_Decal_TrodPath.png | 64x128 | ambientCG Ground048, alpha fades to the sides |
+| T_Decal_RainStreaks.png | 64x128 | drawn rain streaks |
+| T_Decal_RustStreaks.png | 64x128 | drawn rust streaks |
+| T_Decal_PlinthGrime.png | 128x64 | drawn splash grime gradient |
+| T_Decal_Manhole_1.png | 64x64 | cgbookcase ManholeCover10, round cut |
+| T_Decal_Manhole_2.png | 64x64 | cgbookcase ManholeCover06, round cut |
+| T_Ext_Road.png | 256x256 | Asphalt025A at full 256 px, saturation x0.6 |
+| T_Ext_Sidewalk.png | 256x256 | Asphalt021 at full 256 px, saturation x0.6 |
+| T_Ext_Lawn.png | 256x256 | brown_mud_leaves_01 at full 256 px, saturation x0.75 |
+| T_Prop_Notices.png | 128x64 | ambientCG Paper001 + drawn notices (scribbled text, tear-off phone strips) |
+| T_Prop_EntranceDoor.png | 64x128 | ambientCG PaintedMetal013 tinted + drawn frame, rivets, code lock, scratches, stickers |
+| T_Prop_Container.png | 128x64 | ambientCG PaintedMetal006 + drawn stencil and ribs |
+| T_Prop_GarageDoors.png | 128x128 | ambientCG/cgbookcase painted metal + drawn frames, ribs, numbers, rust drips |
+| T_Prop_Twigs.png | 128x128 | drawn branching twigs (alpha card) |
+| T_Prop_Fence.png | 64x32 | drawn decorative fence pattern (alpha) |
+| T_NumberPlates_Floor_Corner_Blue.png | 256x128 | drawn: apartment number plates for Floor_Corner_Blue (written by build_level.py) |
+| T_NumberPlates_Floor_Corridor_Blue.png | 256x128 | drawn: apartment number plates for Floor_Corridor_Blue (written by build_level.py) |
+| T_NumberPlates_Floor_Ring_Blue.png | 256x128 | drawn: apartment number plates for Floor_Ring_Blue (written by build_level.py) |
