@@ -252,3 +252,14 @@ Unity: Filter Mode = Point, Compression = None, Generate Mip Maps off (or on, fo
 | T_NumberPlates_Floor_Mint_Ring.png | 256x128 | drawn: apartment number plates for Floor_Mint_Ring (written by build_floor_v2.py) |
 | T_NumberPlates_Floor_Ochre_Landing.png | 256x128 | drawn: apartment number plates for Floor_Ochre_Landing (written by build_floor_v2.py) |
 | T_NumberPlates_Floor_Panel80_Corner.png | 256x128 | drawn: apartment number plates for Floor_Panel80_Corner (written by build_floor_v2.py) |
+| T_LC_Wall_A.png | 128x256 | ambientCG Wood026 (rotated) graded + drawn key scratches, scratched words, lighter burns, grime |
+| T_LC_Wall_B.png | 128x256 | ambientCG Wood026 (rotated) graded + drawn key scratches, scratched words, lighter burns, grime |
+| T_LC_Floor.png | 128x128 | ambientCG Rubber004 graded to brown linoleum + drawn cigarette burns, gum, scratches |
+| T_LC_Ceiling.png | 64x64 | ambientCG PaintedMetal006 graded off-white (old rust patches stay as stains) |
+| T_LC_Plafond.png | 64x32 | drawn frosted plexiglass shade: bulb glow, scorch, dead flies collected in one corner |
+| T_LC_Panel_A.png | 64x256 | ambientCG Metal009 graded + drawn engraved digits, button recesses, intercom grille, soot, scratches |
+| T_LC_Panel_B.png | 64x256 | ambientCG Metal009 graded + drawn engraved digits, button recesses, intercom grille, soot, scratches, triangle button |
+| T_LC_Rules.png | 64x128 | ambientCG Paper001 graded + drawn "lift rules" plate, no-smoking sign, dispatcher phone, scratches |
+| T_LC_DoorMetal.png | 64x256 | cgbookcase PaintedMetal01 graded + drawn scratches, kick marks, marker scribble |
+| T_LC_Vent.png | 64x32 | ambientCG Metal009 graded + drawn figured vent cut-outs, dust |
+| T_LC_Decals.png | 128x128 | drawn decal atlas: marker tag, scratched heart, cigarette burns, advert sticker with tear-off strips |

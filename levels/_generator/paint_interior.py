@@ -537,13 +537,148 @@ def apartment():
     g = ((xx % 8) < 1) | ((yy % 8) < 1); a[np.broadcast_to(g, (32, 64))] = (140, 140, 136); a *= (.9 + .2 * nz(64, 32, 6, 9))[..., None]
     a[nz(64, 32, 4, 10) > .8] *= .8; save(a, 'T_A_Backsplash', 'drawn white kitchen tiles with grease')
 
+# ------------------------------------------------------------------ lift cab (build_lift.py)
+def pnz(w, h, cell, seed):
+    """smooth noise that tiles (for box-mapped textures)"""
+    a = np.random.RandomState(seed).rand(max(2, h // cell), max(2, w // cell))
+    im = Image.fromarray((np.tile(a, (3, 3)) * 255).astype('uint8')).resize((w * 3, h * 3), Image.BICUBIC)
+    return np.asarray(im).astype(float)[h:2 * h, w:2 * w] / 255
+def lift():
+    import lift_spec as LS
+    FS = lambda s: ImageFont.truetype(FONT, s); FR = lambda s: ImageFont.truetype(FONTR, s)
+    def wrapped(W, fn):
+        for dx in (-W, 0, W): fn(dx)
+    zp = lambda z: 256 * (1 - z / 2.56)                      # 256 px = 2.56 m from the floor
+    PALE = (226, 202, 162)
+    # walls: brown wood-grain laminate over the steel cab, 128 x 256 = 1.28 m x 2.56 m (box UV from the floor)
+    grain = PT.src('am__Wood026').transpose(Image.ROTATE_90).resize((128, 128), Image.BOX)
+    for tag, seed, words in (('A', 1, ['ВИТЯ', '1987']), ('B', 2, ['КОЛЯ', '86'])):
+        r = random.Random(seed); a = tint(A(PT.tile(grain, 128, 256)), (102, 68, 42), contrast=.5)
+        z = 2.56 * (1 - np.arange(256)[:, None] / 256.0)
+        a *= (1 + .05 * np.sin(np.arange(128) / 128 * 2 * math.pi * 3 + seed))[None, :, None] * (.94 + .12 * pnz(128, 256, 16, seed))[..., None]
+        a *= (1 - .2 * np.clip((z - 1.95) / .3, 0, 1))[..., None]                 # dust under the ceiling
+        a *= (1 - .14 * np.clip((.5 - z) / .4, 0, 1))[..., None]                  # shoe grime above the kick plate
+        a *= (1 - .06 * np.exp(-((z - 1.25) / .25) ** 2))[..., None]              # greasy band at hand height
+        im = I(a); d = ImageDraw.Draw(im, 'RGBA')
+        for k in range(30):                                                      # key scratches show the pale core
+            x, y = r.uniform(0, 128), zp(r.uniform(.55, 1.95)); L = r.uniform(3, 20); ang = r.uniform(-.6, .6) + (math.pi / 2 if r.random() < .3 else 0)
+            col = (*PALE, r.randint(30, 75))
+            wrapped(128, lambda dx: d.line([(x + dx, y), (x + dx + L * math.cos(ang), y + L * math.sin(ang))], fill=col))
+        for w_, (x, zz) in zip(words, ((10, 1.62), (74, 1.08))):                    # scratched words
+            y = zp(zz)
+            for i, ch in enumerate(w_):
+                p = (x + i * 7 + r.uniform(-1, 1), y + r.uniform(-1.5, 1.5))
+                wrapped(128, lambda dx: d.text((p[0] + dx, p[1]), ch, font=FR(8), fill=(*PALE, 85)))
+        for k in range(2):                                                       # lighter burns: melted blisters
+            x, y = r.uniform(8, 120), zp(r.uniform(1.0, 1.6))
+            d.ellipse([x - 3, y - 2, x + 3, y + 3], fill=(30, 18, 10, 230)); d.ellipse([x - 1, y, x + 1, y + 1], fill=(96, 64, 36, 255))
+        save(A(im), f'T_LC_Wall_{tag}', 'ambientCG Wood026 (rotated) graded + drawn key scratches, scratched words, lighter burns, grime')
+    # floor: brown linoleum with cigarette burns, 128 px = 1.28 m (tiles)
+    a = tint(photo('am__Rubber004', 128, 128, 128), (84, 70, 56), contrast=.4) * (.88 + .24 * pnz(128, 128, 16, 3))[..., None]
+    im = I(a); d = ImageDraw.Draw(im, 'RGBA'); r = random.Random(4)
+    for k in range(9):
+        x, y = r.uniform(0, 128), r.uniform(0, 128)
+        wrapped(128, lambda dx: (d.ellipse([x + dx - 4, y - 3, x + dx + 4, y + 3], fill=(44, 30, 18, 110)), d.ellipse([x + dx - 2, y - 1, x + dx + 2, y + 1], fill=(12, 9, 6, 235))))
+    for k in range(3):
+        x, y = r.uniform(0, 128), r.uniform(0, 128); wrapped(128, lambda dx: d.ellipse([x + dx - 3, y - 3, x + dx + 3, y + 2], fill=(46, 44, 42, 220)))
+    for k in range(14):
+        x, y = r.uniform(0, 128), r.uniform(0, 128); L = r.uniform(6, 24); ang = r.uniform(0, math.pi)
+        wrapped(128, lambda dx: d.line([(x + dx, y), (x + dx + L * math.cos(ang), y + L * math.sin(ang))], fill=(130, 112, 90, 70)))
+    save(A(im), 'T_LC_Floor', 'ambientCG Rubber004 graded to brown linoleum + drawn cigarette burns, gum, scratches')
+    # ceiling: painted steel, rust stains, 64 px = 0.64 m
+    a = tint(photo('am__PaintedMetal006', 64, 64, 64), (172, 168, 150), contrast=.4) * (.94 + .1 * pnz(64, 64, 8, 6))[..., None]
+    save(a, 'T_LC_Ceiling', 'ambientCG PaintedMetal006 graded off-white (old rust patches stay as stains)')
+    # plafond: frosted plexiglass with the bulb behind it and dead flies, used as emission
+    yy, xx = np.mgrid[0:32, 0:64].astype(float); rr = np.hypot((xx - 30) / 32, (yy - 15) / 17)
+    a = np.zeros((32, 64, 3)) + np.array([255, 236, 200]) * (1 - .5 * np.clip(rr, 0, 1) ** 1.3)[..., None]
+    a *= (.93 + .1 * nz(64, 32, 4, 5))[..., None]; im = I(a); d = ImageDraw.Draw(im, 'RGBA'); r = random.Random(8)
+    d.ellipse([22, 8, 38, 22], fill=(150, 104, 56, 46))
+    for k in range(11):
+        x, y = r.uniform(44, 61), r.uniform(18, 29)
+        d.ellipse([x, y, x + 2, y + 1], fill=(28, 22, 16, 235)); d.point([(x - 1, y + 2), (x + 3, y + 2)], fill=(40, 34, 26, 200))
+    d.rectangle([0, 0, 63, 31], outline=(130, 110, 86, 170)); d.rectangle([1, 1, 62, 30], outline=(170, 150, 120, 90))
+    save(A(im), 'T_LC_Plafond', 'drawn frosted plexiglass shade: bulb glow, scorch, dead flies collected in one corner')
+    # button plate (layout in lift_spec.py): A = normal cab, B = Trader cab (extra triangle button)
+    for var, tag in (('Normal', 'A'), ('Trader', 'B')):
+        r = random.Random(9); a = tint(photo('am__Metal009', 64, 256, 64), (150, 150, 146), contrast=.5)
+        im = I(a); d = ImageDraw.Draw(im, 'RGBA'); LX, BX = LS.LABEL_X, LS.BTN_X; ink = (24, 24, 24, 255)
+        d.rectangle([0, 0, 63, 255], outline=(60, 60, 58, 255)); d.rectangle([1, 1, 62, 254], outline=(205, 205, 200, 110))
+        for sx, sy in ((5, 5), (58, 5), (5, 250), (58, 250)):
+            d.ellipse([sx - 2, sy - 2, sx + 2, sy + 2], fill=(112, 112, 108, 255), outline=(50, 50, 48, 255)); d.line([(sx - 1, sy + 1), (sx + 1, sy - 1)], fill=(36, 36, 36, 255))
+        for i in range(6):                                                      # intercom grille
+            for j in range(3): d.ellipse([18 + i * 5, 11 + j * 5, 20 + i * 5, 13 + j * 5], fill=(16, 16, 16, 255))
+        d.text((32, 35), 'ЛИФТ', font=FS(8), fill=ink, anchor='mm'); d.text((32, 45), '320 кг  4 чел', font=FR(6), fill=(40, 40, 40, 255), anchor='mm')
+        for k, rn in enumerate(LS.rows(var)):
+            y = LS.ROW0 + k * LS.PITCH
+            d.rectangle([BX - 9, y - 7, BX + 9, y + 7], fill=(36, 36, 34, 255), outline=(196, 196, 190, 255))
+            if rn.isdigit(): d.text((LX, y), rn, font=FS(10), fill=ink, anchor='mm')
+            elif rn == 'stop': d.text((LX, y), 'СТОП', font=FS(6), fill=(170, 20, 16, 255), anchor='mm')
+            elif rn == 'call':
+                d.pieslice([LX - 4, y - 5, LX + 4, y + 4], 180, 360, fill=ink); d.rectangle([LX - 4, y - 1, LX + 4, y + 1], fill=ink)
+                d.rectangle([LX - 6, y + 1, LX + 6, y + 2], fill=ink); d.ellipse([LX - 1, y + 3, LX + 1, y + 5], fill=ink)
+            elif rn == 'tri': d.polygon([(LX, y - 5), (LX + 5, y + 4), (LX - 5, y + 4)], outline=ink)
+            if rn in LS.BURNT:                                                  # soot rising from a melted button
+                for rr_ in range(14, 5, -2): d.ellipse([BX - rr_ * .8, y - 2 - rr_ * .9, BX + rr_ * .8, y + rr_ * .5], fill=(12, 10, 8, 34))
+        for k in range(26):
+            x, y = r.uniform(4, 60), r.uniform(50, 250); L = r.uniform(3, 12); ang = r.uniform(-.8, .8)
+            d.line([(x, y), (x + L * math.cos(ang), y + L * math.sin(ang))], fill=(235, 235, 230, 90))
+        scribble(d, 8, 30, 52, r, (34, 36, 80, 200)); scribble(d, 44, 58, 230, r, (34, 36, 80, 200))
+        save(A(im), f'T_LC_Panel_{tag}', 'ambientCG Metal009 graded + drawn engraved digits, button recesses, intercom grille, soot, scratches' + (', triangle button' if tag == 'B' else ''))
+    # rules plate, 64 x 128 = 0.2 m x 0.4 m
+    a = tint(photo('am__Paper001', 64, 128, 64), (206, 194, 160), contrast=.4) * (1 - .14 * (np.arange(128)[:, None] / 128))[..., None]
+    im = I(a); d = ImageDraw.Draw(im, 'RGBA'); r = random.Random(10); ink = (40, 34, 26, 255); red = (150, 28, 22, 255)
+    d.rectangle([0, 0, 63, 127], outline=(70, 60, 44, 255)); d.rectangle([3, 3, 60, 124], outline=(150, 28, 22, 170))
+    d.text((32, 11), 'ПРАВИЛА', font=FS(8), fill=red, anchor='mm'); d.text((32, 20), 'пользования лифтом', font=FR(5), fill=ink, anchor='mm')
+    for i in range(10):
+        y = 28 + i * 7; d.text((6, y - 1), f'{i + 1}.', font=FR(5), fill=ink); scribble(d, 14, 57 - (i % 3) * 7, y + 2, r, (74, 66, 54, 255), step=(2, 5))
+    d.ellipse([6, 103, 19, 116], outline=red, width=2); d.line([(8, 109), (17, 109)], fill=(70, 60, 50, 255), width=2); d.line([(8, 105), (17, 114)], fill=red, width=2)
+    d.text((40, 105), 'Диспетчер', font=FR(5), fill=ink, anchor='mm'); d.text((40, 114), '2-14-07', font=FS(6), fill=ink, anchor='mm')
+    for sx, sy in ((2, 2), (61, 2), (2, 125), (61, 125)): d.point((sx, sy), fill=(40, 40, 40, 255))
+    for k in range(10):
+        x, y = r.uniform(4, 60), r.uniform(24, 124); d.line([(x, y), (x + r.uniform(-8, 8), y + r.uniform(-3, 3))], fill=(250, 246, 236, 120))
+    save(A(im), 'T_LC_Rules', 'ambientCG Paper001 graded + drawn "lift rules" plate, no-smoking sign, dispatcher phone, scratches')
+    # door panels (cab side): painted steel, 64 x 256 = 0.64 m x 2.56 m from the floor (box UV)
+    a = tint(photo('cg__PaintedMetal01', 64, 256, 64), (138, 136, 122), contrast=.55); z = 2.56 * (1 - np.arange(256)[:, None] / 256.0)
+    a *= (1 - .25 * np.clip((.4 - z) / .35, 0, 1))[..., None] * (.95 + .1 * pnz(64, 256, 16, 12))[..., None]
+    im = I(a); d = ImageDraw.Draw(im, 'RGBA'); r = random.Random(12)
+    for k in range(30):
+        x, y = r.uniform(0, 64), zp(r.uniform(.5, 1.9)); L = r.uniform(3, 14); ang = r.uniform(-.5, .5)
+        wrapped(64, lambda dx: d.line([(x + dx, y), (x + dx + L * math.cos(ang), y + L * math.sin(ang))], fill=(224, 222, 210, 100)))
+    for k in range(7):
+        x, y = r.uniform(0, 64), zp(r.uniform(.06, .3)); wrapped(64, lambda dx: d.ellipse([x + dx - 5, y - 2, x + dx + 5, y + 2], fill=(30, 28, 24, 90)))
+    x, y = r.uniform(10, 40), zp(1.35); scribble(d, x, x + 20, y, r, (24, 24, 30, 200)); scribble(d, x + 3, x + 16, y + 4, r, (24, 24, 30, 200))
+    save(A(im), 'T_LC_DoorMetal', 'cgbookcase PaintedMetal01 graded + drawn scratches, kick marks, marker scribble')
+    # ceiling vent: aluminium plate with figured cut-outs
+    a = tint(photo('am__Metal009', 64, 32, 64), (160, 160, 156), contrast=.4); im = I(a); d = ImageDraw.Draw(im)
+    for i in range(7):
+        for j in range(2): cx, cy = 8 + i * 8, 10 + j * 12; d.polygon([(cx, cy - 4), (cx + 3, cy), (cx, cy + 4), (cx - 3, cy)], fill=(14, 14, 14))
+    d.rectangle([0, 0, 63, 31], outline=(70, 70, 68)); a = A(im) * (.85 + .15 * nz(64, 32, 4, 13))[..., None]
+    save(a, 'T_LC_Vent', 'ambientCG Metal009 graded + drawn figured vent cut-outs, dust')
+    # decal atlas 2 x 2: marker tag | scratched heart / cigarette burns | advert sticker with tear-off strips
+    im = Image.new('RGBA', (128, 128), (0, 0, 0, 0)); d = ImageDraw.Draw(im); r = random.Random(14); blue = (30, 34, 84, 215)
+    d.text((32, 20), 'ЛЁХА', font=FS(13), fill=blue, anchor='mm'); d.line([(6, 32), (58, 29)], fill=blue, width=2)
+    d.line([(16, 46), (44, 44)], fill=blue, width=2); d.polygon([(44, 39), (54, 44), (44, 49)], fill=blue)
+    hp = [(96 + 16 * math.sin(t) ** 3, 30 - (13 * math.cos(t) - 5 * math.cos(2 * t) - 2 * math.cos(3 * t) - math.cos(4 * t))) for t in [i / 24 * 2 * math.pi for i in range(25)]]
+    d.line(hp, fill=(*PALE, 180)); d.line([(p[0] + .7, p[1] + .5) for p in hp], fill=(*PALE, 90)); d.text((96, 30), 'С+Т', font=FR(9), fill=(*PALE, 180), anchor='mm')
+    d.line([(78, 52), (114, 50)], fill=(*PALE, 150))
+    for k in range(7):
+        x, y = r.uniform(10, 54), r.uniform(74, 118)
+        d.ellipse([x - 4, y - 3, x + 4, y + 3], fill=(48, 32, 18, 120)); d.ellipse([x - 2, y - 1, x + 2, y + 1], fill=(10, 8, 6, 235))
+    d.rectangle([70, 68, 122, 110], fill=(226, 222, 206, 255)); d.text((96, 78), 'ЗАМКИ', font=FS(8), fill=(30, 30, 30, 255), anchor='mm')
+    d.text((96, 90), 'вскрытие', font=FR(6), fill=(30, 30, 30, 255), anchor='mm'); d.text((96, 100), '2-14-07', font=FS(6), fill=(150, 30, 24, 255), anchor='mm')
+    for i in range(6):
+        x = 71 + i * 8.5
+        if i not in (1, 4): d.rectangle([x, 111, x + 7, 124], fill=(226, 222, 206, 255)); d.line([(x + 3.5, 113), (x + 3.5, 122)], fill=(40, 40, 40, 255))
+    save(im, 'T_LC_Decals', 'drawn decal atlas: marker tag, scratched heart, cigarette burns, advert sticker with tear-off strips')
+
 def finish():
     md = os.path.join(OUT, 'SOURCES.md'); s = open(md).read(); names = {r.split('|')[1].strip() for r in ROWS}
     s = '\n'.join(l for l in s.split('\n') if not (l.startswith('| ') and l.split('|')[1].strip() in names)).rstrip('\n')
     open(md, 'w').write(s + '\n' + '\n'.join(ROWS) + '\n'); print('painted', len(ROWS))
 
 if __name__ == '__main__':
-    which = sys.argv[1:] or ['corridor', 'apartment']
+    which = sys.argv[1:] or ['corridor', 'apartment', 'lift']
     if 'corridor' in which: corridors()
     if 'apartment' in which: apartment()
+    if 'lift' in which: lift()
     finish()

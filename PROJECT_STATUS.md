@@ -28,6 +28,8 @@ from generator scripts and pushed to `main` so Key can `git pull` and open the .
 | Apt_Covered.blend | anomaly: everything under sheets, mirror covered, windows papered, one chair, ~340 letters on the floor | `build_apartment.py Covered <out>` |
 | Apt_Ceiling.blend | anomaly: the room's furniture hangs from the ceiling, chandelier on the floor | `build_apartment.py Ceiling <out>` |
 | Apt_Long.blend | anomaly: 14 m hallway, identical doors/racks/mirrors, lit kitchen at the end | `build_apartment.py Long <out>` |
+| Lift_Cab_Normal.blend | Soviet lift cab interior 1.5 x 1.3 x 2.25 m (outer 1.6 x 1.4 = LiftA_Cab size): laminate walls with scratches, button plate (7 and 4 burnt), rules plate, plafond with dead flies, vent, 4 telescopic door panels (custom prop `slide_x` = open offset), sill/header. ~600 tris | `build_lift.py Normal <out>` |
+| Lift_Cab_Trader.blend | the same cab grown to 2.2 x 2.6 m, second plafond dead, extra triangle button. `LiftCab_BackWall` = one mesh with shape keys `Crack` (panel swells, H-seam opens, booth light leaks) and `Open` (halves roll into lips: 0.89 x 0.65 m service window, lower lip = sill). Behind: `Booth_*` (ochre back room, counter, bare bulb, `Spawn_Trader`). Action `BackWall_Open` previews it (frames 1-144). ~2.7k tris | `build_lift.py Trader <out>` |
 | Floor_Corridor_Blue / Corner_Blue / Ring_Blue.blend | v1 floors, blue/concrete style (older, flatter look) | `build_level.py <corridor/corner/ring> blue <out>` |
 | Floor_LiftHall.blend | v1 green corridor (oldest). Generator kept only as reference in `_generator/legacy/` | not maintained |
 | ../Panels1.blend, ../Panels2.blend | Key's downloaded reference models (exteriors only). Panels2 lods are reused in Street_Night | do not modify |
@@ -44,22 +46,24 @@ v2 lift doors are 1.0 m wide (Key found 0.8 m too narrow).
 - `build_floor_v2.py`: corridor themes (THEMES dict: door atlas cells, lamp type, light colour, extras) x layouts
   (`layout_landing` here; corridor/corner/ring come from build_level.py).
 - `build_apartment.py`: apartment plan + furniture library + variants.
+- `build_lift.py` (+ `lift_spec.py`: button plate layout shared with the painter): lift cab Normal / Trader. The morph wall is a
+  grid with an H-shaped 1 mm seam; shape key targets are computed per vertex (lip profile), so the topology is identical.
 - `build_street.py` (+ `car_spec.py`): the street. Reuses build_level.py helpers via exec.
 - `build_level.py`: v1 floors (styles blue/green) and the layout data reused by v2.
 - `paint_textures.py`: street cars, wheels, plates, outdoor decals, props (`python3 paint_textures.py cars decals props`).
 - `paint_interior.py`: v2 corridor walls/floors/ceilings/doors/lifts/props/decals and all apartment textures
-  (`python3 paint_interior.py corridor apartment`). Textures are linked by relative path, so repainting
+  (`python3 paint_interior.py corridor apartment lift`). Textures are linked by relative path, so repainting
   updates the .blend files without rebuilding.
 - `texture_sheet.py`: contact sheet of CC0 bases. Preview renders: `.claude/skills/blender-keytools/tools/render_preview.py`
   (mode preview or lowres); bpy installer: `.claude/skills/blender-keytools/tools/install_bpy.sh` (called by setup_headless.sh).
 - `legacy/`: one-off texture prep scripts of the v1 textures (T_Wall_*, T_Ext_*, ...) and the Floor_LiftHall builder.
 - Rebuild everything: run each builder with the output path `levels/<File>.blend` (absolute path), from any dir.
 
-## Textures (levels/textures/, 244 PNG)
+## Textures (levels/textures/, 255 PNG)
 - Every file has a row in `SOURCES.md` (CC0 base + what was drawn). Keep that up to date.
 - Prefixes: `T_IW_/T_IF_/T_IC_<Theme>` corridor wall/floor/ceiling, `T_IDoors_/T_ILift_<Theme>` door atlases,
   `T_IP_` corridor props, `T_ID_` interior decals, `T_AW_/T_AF_/T_AC_/T_A_` apartment, `T_Ext_` street,
-  `T_Car_` cars, `T_Decal_` outdoor decals, `T_Prop_` street props, `T_NumberPlates_<File>` per-floor plates.
+  `T_Car_` cars, `T_Decal_` outdoor decals, `T_Prop_` street props, `T_NumberPlates_<File>` per-floor plates, `T_LC_` lift cab.
 - Size 64-256 px, 15-bit colour, Closest filtering. Bases: 256 px previews from
   github.com/Papyszoo/CC0-Public-Domain-Textures (ambientCG, Poly Haven, cgbookcase, ShareTextures).
 
@@ -67,6 +71,9 @@ v2 lift doors are 1.0 m wide (Key found 0.8 m too narrow).
 - Textures: Filter Mode Point, Compression None. Alpha decals, tulle, leaves need Alpha Clipping or Transparent.
 - PS1 look comes mostly from a low internal render resolution + point filtering (+ optional PS1 vertex shader).
 - Not done yet: FBX export (kt.export_fbx exists), colliders, apartment/corridor connection is a scene change.
+- Trader window: export `LiftCab_BackWall` as FBX (checked: Basis/Crack/Open survive as blend shapes), SkinnedMeshRenderer.
+  Animate Crack 0->100 (slow), then crossfade Crack 100->0 with Open 0->100 (keys are relative to Basis, so don't leave both
+  at 100). Turn Light_Booth on with Crack: the seam then shows as thin lines of light. Lights *_Flicker as usual.
 
 ## Open questions / next steps
 - Waiting for Key: halve the level textures (32-50 px/m, 16 colour levels, keep text sharp) for a cruder PS1 look,
@@ -75,6 +82,8 @@ v2 lift doors are 1.0 m wide (Key found 0.8 m too narrow).
   Mr. Nobody / Trader / Greed characters, morphing props with shape keys, more apartment anomalies,
   bringing v1 floors up to the v2 look.
 - Floor_Decay_Corridor lift hall is almost dark (only emergency light): intended, may need a flashlight.
+- Lift cabs: not placed into the floor files yet (Normal fits the v2 shaft: cab front outer face = shaft side of the wall; Trader
+  does not fit any shaft, it is meant as a separate scene / swap). Waiting for Key's feedback on the window opening.
 
 ## History (2026-11-02 .. 03)
 1. Checked Key's Panels1/2.blend (exteriors only, no interiors). Installed bpy headless.
@@ -83,3 +92,4 @@ v2 lift doors are 1.0 m wide (Key found 0.8 m too narrow).
 4. Street_Night, then upgraded: modelled cars with painted atlases, alpha puddles, decals against tiling, better props.
 5. v2 interiors from scratch: kit.py, 4 themed floors, 5 apartments, painted floor-to-ceiling walls, fake AO.
 6. Lifts widened to 1.0 m. Skill got a generic art_and_gotchas.md + tools; Postscript rules in ART_DIRECTION.md; this status file.
+7. Lift cab interiors: Normal + Trader with the morphing back wall (window for the Trader).

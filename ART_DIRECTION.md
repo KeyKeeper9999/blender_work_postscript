@@ -50,6 +50,7 @@ Where they differ, this file wins for Postscript. Read once per chat before mode
 ## Sizes used (1 unit = 1 m)
 - Storey: ceiling 2.6 (interiors), 2.8 floor-to-floor on the 9-storey facade, 2.7 on the 5-storey; 3 m facade bays.
 - Corridor 2 m wide; apartment door opening 0.94 x 2.07; interior door 0.8 x 2.0; window sill 0.85-0.9.
+- Lift cab inside 1.5 x 1.3 x 2.25 m (Trader version 2.2 x 2.6), telescopic doors 1.0 x 2.05, button plate 0.92-1.48 m.
 - Lift doors 1.0 m wide in the v2 floors (real Soviet 320-500 kg lifts: ~0.7 m, dnaop.com; Key found 0.8 m too
   narrow in game).
 
