@@ -1,6 +1,6 @@
 # Postscript art repo: project status
 
-Read this at the start of every new chat. Last updated: 2026-11-03.
+Read this at the start of every new chat (then ART_DIRECTION.md before modeling). Last updated: 2026-11-03.
 Key works from claude.ai cloud sessions (no Blender UI here): everything is built headless with bpy
 from generator scripts and pushed to `main` so Key can `git pull` and open the .blend files.
 
@@ -12,7 +12,8 @@ from generator scripts and pushed to `main` so Key can `git pull` and open the .
 - First thing in a new cloud session: `bash levels/_generator/setup_headless.sh` (installs bpy 5.2, texture list).
 - Art direction: PS1-style horror like Voices of the Void / KLETKA, night, late autumn (no snow),
   dread without jump scares, everyday Soviet panel-block details, small wrong things.
-- How to make it look good and the known Blender traps: `.claude/skills/blender-keytools/art_and_gotchas.md`.
+- Art direction for this game (PS1 target, palette, Soviet details, storytelling, sizes): `ART_DIRECTION.md`.
+  Generic craft and Blender traps (any project): `.claude/skills/blender-keytools/art_and_gotchas.md`.
 
 ## What exists (levels/)
 | File | What it is | Rebuild |
@@ -49,7 +50,8 @@ v2 lift doors are 1.0 m wide (Key found 0.8 m too narrow).
 - `paint_interior.py`: v2 corridor walls/floors/ceilings/doors/lifts/props/decals and all apartment textures
   (`python3 paint_interior.py corridor apartment`). Textures are linked by relative path, so repainting
   updates the .blend files without rebuilding.
-- `render_preview.py`: preview renders (mode preview or ps1). `texture_sheet.py`: contact sheet of CC0 bases.
+- `texture_sheet.py`: contact sheet of CC0 bases. Preview renders: `.claude/skills/blender-keytools/tools/render_preview.py`
+  (mode preview or lowres); bpy installer: `.claude/skills/blender-keytools/tools/install_bpy.sh` (called by setup_headless.sh).
 - `legacy/`: one-off texture prep scripts of the v1 textures (T_Wall_*, T_Ext_*, ...) and the Floor_LiftHall builder.
 - Rebuild everything: run each builder with the output path `levels/<File>.blend` (absolute path), from any dir.
 
@@ -80,4 +82,4 @@ v2 lift doors are 1.0 m wide (Key found 0.8 m too narrow).
 3. Blue/concrete style + 3 layouts (corridor, corner, ring) via build_level.py.
 4. Street_Night, then upgraded: modelled cars with painted atlases, alpha puddles, decals against tiling, better props.
 5. v2 interiors from scratch: kit.py, 4 themed floors, 5 apartments, painted floor-to-ceiling walls, fake AO.
-6. Lifts widened to 1.0 m. Skill updated with art_and_gotchas.md, this status file added.
+6. Lifts widened to 1.0 m. Skill got a generic art_and_gotchas.md + tools; Postscript rules in ART_DIRECTION.md; this status file.
