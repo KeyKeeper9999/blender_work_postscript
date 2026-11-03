@@ -14,11 +14,20 @@ LIST = '/tmp/claude-0/papy.txt'
 PACK = {'am': 'ambientcg', 'po': 'polyhaven', 'sh': 'sharetextures', 'cg': 'cgbookcase'}
 ROWS = []
 
+def ensure_list():
+    """file list of the CC0 mirror (blobless clone: tree only, no texture data)"""
+    if os.path.exists(LIST): return
+    d = '/tmp/claude-0/CC0-Public-Domain-Textures'
+    if not os.path.isdir(d):
+        subprocess.run(['git', 'clone', '-q', '--depth', '1', '--filter=blob:none', '--no-checkout',
+                        'https://github.com/Papyszoo/CC0-Public-Domain-Textures', d], check=True)
+    out = subprocess.run(['git', '-C', d, 'ls-tree', '-r', '--name-only', 'HEAD'], check=True, capture_output=True, text=True).stdout
+    os.makedirs(os.path.dirname(LIST), exist_ok=True); open(LIST, 'w').write(out)
 def src(key):
     """256 px colour preview of a CC0 texture (downloaded once from the Papyszoo mirror)"""
     os.makedirs(CACHE, exist_ok=True); p = f'{CACHE}/{key}.png'
     if not os.path.exists(p):
-        pk, name = key.split('__'); lines = open(LIST).read().split('\n')
+        ensure_list(); pk, name = key.split('__'); lines = open(LIST).read().split('\n')
         c = [l for l in lines if l.startswith(f'packs/{PACK[pk]}-textures/textures/{name}/') and l.endswith('_preview.png')]
         col = [l for l in c if re.search(r'(?i)(color|albedo|diffuse|diff|basecolor|col)[^/]*_preview', l)] or c
         subprocess.run(['curl', '-sS', '--retry', '3', '-o', p, 'https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Textures/main/' + col[0]], check=True)

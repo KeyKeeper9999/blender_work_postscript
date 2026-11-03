@@ -8,6 +8,8 @@ the game and the files (object, material, collection names) in English.
 Blender 5.2, Unity 6.3 (URP, Input System), Cinemachine 3, FMOD 2.03. 1 Blender unit = 1 m.
 
 ## How to work
+- New chat: read `PROJECT_STATUS.md` first (what exists, how to rebuild, open questions, Key's preferences)
+  and keep it updated when you finish something.
 - For any Blender task use the `blender-keytools` skill in `.claude/skills/` (read its
   SKILL.md first). If there are no Blender MCP tools, follow its "Headless mode" section.
 - Keep it simple: build only what was asked, no extras "for later".
