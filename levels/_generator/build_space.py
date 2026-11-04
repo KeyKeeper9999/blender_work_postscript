@@ -368,5 +368,91 @@ if VAR == 'Nested':
     nested(0, Vector((0, 0, 0)))
     marker('Spawn_Player', (1.0, .8, 0), 90); ANCH = ['Shell_L0']
 
+# ================================================================ Dunes: not a room at all
+if VAR == 'Dunes':
+    SZ, NG = 110.0, 70; ST_ = SZ / NG
+    def hgt(x, y):
+        u, v = x * .8 + y * .6, -x * .6 + y * .8
+        h = .9 * math.sin(.16 * u + .9 * math.sin(.06 * v)) + .45 * math.sin(.37 * u + 1.3 + .4 * math.sin(.11 * v)) * math.cos(.21 * v) + .25 * math.sin(.9 * u + .5 * v) + .6 * math.sin(.045 * v + 2.0)
+        return 1.8 * h * (.04 + .96 * min(1.0, max(0.0, (math.hypot(x, y) - 6.0) / 12.0)))    # flatter where you come in
+    HG = [[hgt(-SZ / 2 + i * ST_, -SZ / 2 + j * ST_) for j in range(NG + 1)] for i in range(NG + 1)]
+    def surf(x, y):
+        fx, fy = (x + SZ / 2) / ST_, (y + SZ / 2) / ST_; i, j = min(NG - 1, int(fx)), min(NG - 1, int(fy)); u, v = fx - i, fy - j
+        h00, h10, h11, h01 = HG[i][j], HG[i + 1][j], HG[i + 1][j + 1], HG[i][j + 1]
+        return h00 + u * (h10 - h00) + v * (h11 - h10) if u >= v else h00 + v * (h01 - h00) + u * (h11 - h01)
+    bm = bmesh.new(); VG = [[bm.verts.new((-SZ / 2 + i * ST_, -SZ / 2 + j * ST_, HG[i][j])) for j in range(NG + 1)] for i in range(NG + 1)]
+    for i in range(NG):
+        for j in range(NG): bm.faces.new((VG[i][j], VG[i + 1][j], VG[i + 1][j + 1])); bm.faces.new((VG[i][j], VG[i + 1][j + 1], VG[i][j + 1]))
+    make('Dunes', bm, 'Ground', [tm('T_SP_LetterDune', (1.6, 1.6))], recalc=False)
+    PX, PY = 2.2, 4.5                                                              # the postbox under the only street lamp
+    bm = bmesh.new(); cyl(bm, (PX, PY, surf(PX, PY) - .3), (PX, PY, 1.1 + surf(PX, PY)), .035, 8, 1); z0 = surf(PX, PY) + 1.05
+    fr = wbox(bm, (PX - .18, PY - .11, z0), (PX + .18, PY + .11, z0 + .47), 1)
+    for f in bm.faces: f.normal_update()
+    ff = [f for f in bm.faces if f.calc_center_median().y < PY - .109 and abs(f.normal.y) > .9 and f.calc_center_median().z > z0]
+    for f in ff: f.material_index = 0; set_uv(bm, f, ('y', PY - .11, -1), PX - .18, PX + .18, z0, z0 + .47)
+    prism(bm, lambda p, q, a: (a, p, q), [(PY - .13, z0 + .47), (PY + .13, z0 + .47), (PY + .13, z0 + .5), (PY, z0 + .54), (PY - .13, z0 + .5)], PX - .2, PX + .2, 1)
+    make('Postbox', bm, 'Props', [xm('T_SP_Postbox'), flat('M_Postbox_Blue', (.05, .09, .2), .5)])
+    bm = bmesh.new(); uvl = bm.loops.layers.uv.new('UVMap')
+    for k in range(5):                                                             # letters stuck in the slot
+        x = PX - .14 + k * .07; a = math.radians(R.uniform(-25, 25)); zs = z0 + .4
+        fc = quad(bm, [(x - .03, PY - .1, zs), (x + .03, PY - .1, zs), (x + .03 + .05 * math.sin(a), PY - .1 - .1, zs + .03), (x - .03 + .05 * math.sin(a), PY - .1 - .1, zs + .03)], 0)
+        for lp, uv in zip(fc.loops, ((0, 0), (1, 0), (1, 1), (0, 1))): lp[uvl].uv = uv
+    make('Decal_SlotLetters', bm, 'Props', [xm('T_A_Envelope')], recalc=False)
+    LX_, LY_ = PX + 1.0, PY + .9; bm = bmesh.new(); zb = surf(LX_, LY_) - .3
+    cyl(bm, (LX_, LY_, zb), (LX_, LY_, zb + 6.8), .1, 8, 0, r1=.07); cyl(bm, (LX_, LY_, zb + 6.6), (PX + .2, PY + .2, zb + 6.7), .03, 6, 0)
+    wbox(bm, (PX + .02, PY + .05, zb + 6.55), (PX + .45, PY + .35, zb + 6.72), 0); wbox(bm, (PX + .05, PY + .08, zb + 6.53), (PX + .42, PY + .32, zb + 6.5505), 1)
+    make('Street_Lamp', bm, 'Props', [tm('T_Ext_Pole'), glow('M_Sodium_Glow', (1, .6, .25), 8.0)]); LIGHTS.append(('Light_Street', (PX + .23, PY + .2, zb + 6.3), 500, (1, .55, .2)))
+    bm = bmesh.new(); POLES = []                                                   # telegraph poles to the horizon, some leaning
+    for k in range(9):
+        x = -52 + 13 * k; y = 14 + .1 * x; zb = surf(x, y) - .4; lean = math.radians(R.choice((0, 0, 3, 6, 11)) * R.choice((-1, 1)))
+        top = Vector((x + 7.2 * math.sin(lean), y, zb + 7.2 * math.cos(lean))); cyl(bm, (x, y, zb), tuple(top), .12, 8, 0, r1=.1)
+        ax = Vector((1, .1, 0)).normalized(); side = Vector((-ax.y, ax.x, 0)); ca = Vector((x, y, zb)).lerp(top, (7.2 - .45) / 7.2)
+        a_, b_ = ca - side * .7, ca + side * .7; cyl(bm, tuple(a_), tuple(b_), .06, 4, 0)
+        ins = [tuple(p + Vector((0, 0, .04))) for p in (ca - side * .6, ca + side * .6)]
+        for p in ins: cyl(bm, p, (p[0], p[1], p[2] + .12), .03, 6, 1)
+        POLES.append([Vector(p) + Vector((0, 0, .1)) for p in ins])
+    for A_, B2 in zip(POLES, POLES[1:]):
+        for w in range(2):
+            pts = [A_[w].lerp(B2[w], .002 + .996 * t / 10) - Vector((0, 0, .7 * math.sin(math.pi * t / 10))) for t in range(11)]
+            rg = [[bm.verts.new(v) for v in ring] for ring in path_rings([tuple(p) for p in pts], [.008] * len(pts), 4)]
+            for ra, rb in zip(rg, rg[1:]):
+                for q in range(4): bm.faces.new((ra[q], ra[(q + 1) % 4], rb[(q + 1) % 4], rb[q])).material_index = 2
+            bm.faces.new(rg[0][::-1]).material_index = 2; bm.faces.new(rg[-1]).material_index = 2
+    make('Telegraph_Poles', bm, 'Props', [flat('M_Pole_Wood', (.15, .11, .075), .9), flat('M_Insulator', (.5, .52, .48), .3), WIRE])
+    bm = bmesh.new(); zd = surf(0, 0)                                              # the door you came through, standing alone
+    for x0, x1 in ((-.54, -.47), (.47, .54)): wbox(bm, (x0, -.075, zd - .3), (x1, .075, zd + 2.07), 0)
+    wbox(bm, (-.54, -.075, zd + 2.0705), (.54, .075, zd + 2.14), 0); make('Door_Frame', bm, 'Doors', [FRAME])
+    bm = bmesh.new(); caps = prism(bm, lambda p, q, a: (p, a, q), [(0, .02), (.932, .02), (.932, 2.05), (0, 2.05)], -.0225, .0225, 0)
+    for fc in bm.faces:
+        if fc not in caps: fc.material_index = 1
+    uvl = bm.loops.layers.uv.get('UVMap') or bm.loops.layers.uv.new('UVMap')
+    for c in caps:
+        for lp in c.loops: lp[uvl].uv = (lp.vert.co.x / .932 / 8, (lp.vert.co.z - .02) / 2.03)
+    lbox(bm, lambda u, z, w: (u, w, z), .8, .84, .95, 1.1, -.065, -.0225, 2)
+    o = make('Door', bm, 'Doors', [xm('T_IDoors_Panel80'), flat('M_Door_Edge', (.25, .2, .14)), BRASS], loc=(-.466, 0, zd), rot=(0, 0, math.radians(-35))); IGN.append(o.name)
+    bm = bmesh.new(); uvl = bm.loops.layers.uv.new('UVMap'); fc = quad(bm, [(-.4, .25, surf(-.4, .25) + .006), (.4, .25, surf(.4, .25) + .006), (.4, .75, surf(.4, .75) + .006), (-.4, .75, surf(-.4, .75) + .006)], 0)
+    for lp, uv in zip(fc.loops, ((0, 0), (1, 0), (1, 1), (0, 1))): lp[uvl].uv = uv
+    make('Decal_Doormat', bm, 'Props', [xm('T_IP_MatRag')], recalc=False)
+    bm = bmesh.new(); uvl = bm.loops.layers.uv.new('UVMap'); placed = []; k = tries = 0            # loose letters on top of the dunes
+    while k < 520 and tries < 40000:
+        tries += 1; rr = 18 * math.sqrt(R.random()); t = R.uniform(0, 2 * math.pi); x, y = rr * math.cos(t), rr * math.sin(t)
+        if R.random() < .35: x, y = PX + R.gauss(0, .5), PY + R.gauss(0, .5)                     # a drift below the postbox
+        if abs(x) < .6 and abs(y) < .8: continue
+        lay = k % 3; a = R.uniform(0, 2 * math.pi)
+        if any(math.hypot(x - px, y - py) < .2 and pl == lay for px, py, pl in placed): continue
+        placed.append((x, y, lay)); cs = [(x + p * math.cos(a) - q * math.sin(a), y + p * math.sin(a) + q * math.cos(a)) for p, q in ((-.08, -.04), (.08, -.04), (.08, .04), (-.08, .04))]
+        fc = quad(bm, [(cx, cy, surf(cx, cy) + .008 + lay * .005) for cx, cy in cs], 0)
+        for lp, uv in zip(fc.loops, ((0, 0), (1, 0), (1, 1), (0, 1))): lp[uvl].uv = uv
+        k += 1
+    make('Decal_Letters', bm, 'Props', [xm('T_A_Envelope')], recalc=False)
+    for i, (p, tex) in enumerate((((34, 72, 9), 'T_Ext_Curtain_1'), ((-46, 58, 15), 'T_Ext_Curtain_3'))):   # windows lit in the sky, no building
+        bm = bmesh.new(); uvl = bm.loops.layers.uv.new('UVMap'); fc = quad(bm, [(-.6, 0, 0), (.6, 0, 0), (.6, 0, 1.4), (-.6, 0, 1.4)], 0)
+        for lp, uv in zip(fc.loops, ((0, 0), (1, 0), (1, 1), (0, 1))): lp[uvl].uv = uv
+        for a in ((-.66, -.6), (.6, .66)): wbox(bm, (a[0], -.06, -.06), (a[1], -.002, 1.46), 1)
+        for z0_, z1_ in ((-.06, 0), (1.4, 1.46)): wbox(bm, (-.5995, -.06, z0_), (.5995, -.002, z1_), 1)
+        wbox(bm, (-.025, -.05, .0005), (.025, -.002, 1.3995), 1)
+        o = make(f'Window_Sky_{i}', bm, 'Props', [glowtex(f'M_{tex[2:]}_Glow', tex, 2.5), flat('M_Frame_Dark', (.04, .035, .03), .8)], loc=p, rot=(0, 0, math.atan2(-p[0], p[1]))); IGN.append(o.name)
+    marker('Spawn_Player', (0, .9, surf(0, .9)), 90); marker('Exit_Door', (0, -.3, surf(0, -.3)), -90); ANCH = ['Dunes']
+
 for n_, loc, e, c in LIGHTS: light(n_, loc, e, c)
 finish(anchors=ANCH, ignore=IGN)

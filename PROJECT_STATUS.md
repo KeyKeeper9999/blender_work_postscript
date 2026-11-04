@@ -33,6 +33,7 @@ from generator scripts and pushed to `main` so Key can `git pull` and open the .
 | Space_Sorting.blend | strange space: post sorting hall 10 x 26 x 7 m that cannot fit in the block, walls of post office boxes floor to ceiling, rolling ladder, 10 sorting tables with racks, green pendant lamps (3 lit), mail sacks, ~380 letters (denser further in) | `build_space.py Sorting <out>` |
 | Space_Queue.blend | strange space: 30 m polyclinic corridor (mint), seat rows with empty seated coats (no one inside, collars black), shoes in front, hats on laps or floating, closed office doors, lit reception window + queue display at the end | `build_space.py Queue <out>` |
 | Space_Nested.blend | strange space: a furnished room with the same room inside it at 1/2 scale (wallpaper outside too), and 1/4, and a closed 1/8 box with a lit window. Each copy has its own lit chandelier; peek through the box windows | `build_space.py Nested <out>` |
+| Space_Dunes.blend | not a room at all: night dunes made of letters (110 x 110 m, flat where you come in), telegraph poles with sagging wires to the horizon (some leaning), a blue postbox stuffed with letters under the only sodium lamp, the apartment door you came through standing alone ajar, two lit windows hanging in the sky with no building | `build_space.py Dunes <out>` |
 | Space_Stack.blend | strange space: the kitchens of all 14 floors stacked with no floors between them (39 m shaft): slab ledges, a door, window, radiator, wall sink, cabinets at every level, lamps on cords from the top, yellow gas riser. Bottom kitchen fully furnished | `build_space.py Stack <out>` |
 | Floor_Corridor_Blue / Corner_Blue / Ring_Blue.blend | v1 floors, blue/concrete style (older, flatter look) | `build_level.py <corridor/corner/ring> blue <out>` |
 | Floor_LiftHall.blend | v1 green corridor (oldest). Generator kept only as reference in `_generator/legacy/` | not maintained |
@@ -43,8 +44,8 @@ from generator scripts and pushed to `main` so Key can `git pull` and open the .
 |---|---|---|
 | Char_Flower.blend | person-high flower (1.75 m) in a clay pot. `Flower` has shape keys Droop and Wilt (stem bends toward the viewer, petals close into a bud); action Flower_Wilt | `build_character.py Flower <out>` |
 | Char_MrNobody.blend | black coat, trousers, shoes and a floating fedora on nobody: no head, no hands, black inside (2.07 m) | `build_character.py MrNobody <out>` |
-| Char_Trader.blend | shop assistant in a blue work coat, black sleeve protectors, long fingers resting at 0.92 m (= the Lift_Cab_Trader counter, stand him at Spawn_Trader), triangle head `Trader_Head` with its pivot at the neck | `build_character.py Trader <out>` |
-| Char_Greed.blend | 3.3 m red royal mantle with ermine trim and cape, open front with black void, `Greed_Eye` (pivot at its centre, can look around) instead of a head, `Greed_Crown` of banknotes and coin stacks floating above | `build_character.py Greed <out>` |
+| Char_Trader.blend | not human: a floating off-white triangle (0.64 m) with a round hole, `Trader_Eye` deep in it (pivot at its centre, faint glow). Three thin jointed arms with black sleeve protectors, one from each corner: two lay long-fingered hands on the counter at 0.92 m (= Lift_Cab_Trader booth, origin at the floor: put it at Spawn_Trader), the top one hangs a hand in front. Threads from the corners up to 2.25 m (the booth ceiling), like a puppet | `build_character.py Trader <out>` |
+| Char_Greed.blend | 2.9 m red royal mantle whose front opening is an almond like an eyelid; `Greed_Eye` (pivot at its centre) looks out of it from the black inside. Spiky white fur with black ermine tips (four-sided spikes) on the cape, along the hem and as lashes along the opening; `Greed_Crown` of banknotes and coin stacks floats over the empty collar | `build_character.py Greed <out>` |
 
 All floors: lift A works (Exit_LiftA marker), lift B is broken (doors ajar, empty shaft, sign), stair door
 locked, Spawn_Player marker, a "wrong" door painted like the wall in some layouts, muddy footprints
@@ -75,7 +76,7 @@ v2 lift doors are 1.0 m wide (Key found 0.8 m too narrow).
 - `legacy/`: one-off texture prep scripts of the v1 textures (T_Wall_*, T_Ext_*, ...) and the Floor_LiftHall builder.
 - Rebuild everything: run each builder with the output path `levels/<File>.blend` (absolute path), from any dir.
 
-## Textures (levels/textures/, 271 PNG)
+## Textures (levels/textures/, 274 PNG)
 - Every file has a row in `SOURCES.md` (CC0 base + what was drawn). Keep that up to date.
 - Prefixes: `T_IW_/T_IF_/T_IC_<Theme>` corridor wall/floor/ceiling, `T_IDoors_/T_ILift_<Theme>` door atlases,
   `T_IP_` corridor props, `T_ID_` interior decals, `T_AW_/T_AF_/T_AC_/T_A_` apartment, `T_Ext_` street,
@@ -100,7 +101,7 @@ v2 lift doors are 1.0 m wide (Key found 0.8 m too narrow).
   Mr. Nobody / Trader / Greed characters, morphing props with shape keys, more apartment anomalies,
   bringing v1 floors up to the v2 look.
 - Floor_Decay_Corridor lift hall is almost dark (only emergency light): intended, may need a flashlight.
-- Characters are first prototypes: no rig, no LODs. Next step if Key likes the shapes: armatures (Trader arms/head, Mr. Nobody
+- Key liked the Flower; Trader and Greed were too ordinary in v1 (now redone). Characters are prototypes: no rig, no LODs. Next step if Key likes the shapes: armatures (Trader arms/head, Mr. Nobody
   walk?), Greed's mantle cloth motion as shape keys, a wilted colour for the Flower.
 - Strange spaces are separate scenes reached through a door (Spawn_Player / Exit_* markers), no corridor connection yet.
 - Lift cabs: not placed into the floor files yet (Normal fits the v2 shaft: cab front outer face = shaft side of the wall; Trader
@@ -115,3 +116,4 @@ v2 lift doors are 1.0 m wide (Key found 0.8 m too narrow).
 6. Lifts widened to 1.0 m. Skill got a generic art_and_gotchas.md + tools; Postscript rules in ART_DIRECTION.md; this status file.
 7. Lift cab interiors: Normal + Trader with the morphing back wall (window for the Trader).
 8. Four strange spaces (Sorting, Queue, Nested, Stack) and prototypes of the four characters.
+9. Space_Dunes (outdoors, not a room). Trader and Greed redone after Key's feedback: Trader not human at all, Greed's eye inside the mantle, spiky fur. Flower kept.

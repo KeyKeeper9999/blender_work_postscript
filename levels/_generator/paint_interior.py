@@ -703,6 +703,28 @@ def space():
     d.rectangle([0, 44, 63, 63], fill=(214, 208, 190)); d.text((32, 54), 'КАБ.', font=FS(8), fill=(30, 30, 30), anchor='mm')
     d.rectangle([64, 44, 127, 63], fill=(26, 26, 24)); d.text((96, 54), 'ВАШ №', font=FS(8), fill=(220, 120, 40), anchor='mm')
     save(A(im) * (.92 + .1 * nz(128, 64, 4, 24))[..., None], 'T_SP_Signs', 'drawn signs: reception, keep quiet, office plate, queue number')
+    # dunes of letters: overlapping envelopes, 128 px = 1.6 m (top-down box UV, tiles)
+    r = random.Random(25); a = tint(photo('am__Paper001', 128, 128, 128), (170, 160, 136), contrast=.4) * (.7 + .3 * pnz(128, 128, 16, 26))[..., None]
+    im = I(a); d = ImageDraw.Draw(im, 'RGBA')
+    PAPER = [(214, 204, 178), (226, 222, 210), (196, 176, 136), (176, 190, 200), (204, 196, 170), (160, 140, 104)]
+    for k in range(230):
+        x, y, ang = r.uniform(0, 128), r.uniform(0, 128), r.uniform(0, math.pi); w_, h_ = r.uniform(11, 16), r.uniform(6, 9); c_ = r.choice(PAPER); sh = r.uniform(.75, 1.05)
+        col = tuple(int(v * sh) for v in c_); ca, sa = math.cos(ang), math.sin(ang)
+        P = lambda u, v: (x + u * ca - v * sa, y + u * sa + v * ca)
+        for dx in (-128, 0, 128):
+            for dy in (-128, 0, 128):
+                Q = lambda u, v: (P(u, v)[0] + dx, P(u, v)[1] + dy)
+                d.polygon([Q(-w_ / 2, -h_ / 2), Q(w_ / 2, -h_ / 2), Q(w_ / 2, h_ / 2), Q(-w_ / 2, h_ / 2)], fill=(*col, 255), outline=(*(int(v * .6) for v in col), 255))
+                d.line([Q(-w_ / 2 + 2, -1), Q(w_ / 2 - 4, -1)], fill=(70, 70, 90, 150)); d.line([Q(-w_ / 2 + 2, 1), Q(w_ / 2 - 6, 1)], fill=(70, 70, 90, 120))
+                if k % 5 == 0: d.polygon([Q(w_ / 2 - 3.5, -h_ / 2 + 1), Q(w_ / 2 - 1, -h_ / 2 + 1), Q(w_ / 2 - 1, -h_ / 2 + 3.5), Q(w_ / 2 - 3.5, -h_ / 2 + 3.5)], fill=(150, 40, 40, 230))
+    a = A(im) * (.78 + .3 * pnz(128, 128, 32, 27))[..., None]
+    save(a, 'T_SP_LetterDune', 'ambientCG Paper001 graded + drawn overlapping envelopes, address lines, stamps (tiles)')
+    # blue Soviet postbox front
+    a = tint(photo('am__PaintedMetal007', 64, 64, 64), (44, 72, 136), contrast=.5); im = I(a); d = ImageDraw.Draw(im)
+    d.rectangle([8, 10, 55, 14], fill=(10, 10, 14)); d.text((32, 28), 'ПОЧТА', font=FS(10), fill=(232, 232, 226), anchor='mm')
+    d.rectangle([22, 38, 42, 50], outline=(232, 232, 226)); d.line([(22, 38), (32, 45), (42, 38)], fill=(232, 232, 226)); d.rectangle([0, 0, 63, 63], outline=(20, 30, 60))
+    a = A(im); m = (nz(64, 64, 3, 28) > .72) & (np.arange(64)[:, None] > 44); a[m] = a[m] * .4 + np.array([110, 55, 25]) * .6
+    save(a, 'T_SP_Postbox', 'ambientCG PaintedMetal007 graded blue + drawn slot, lettering, envelope emblem, rust')
 
 # ------------------------------------------------------------------ character prototypes (build_character.py)
 def chars():
@@ -729,6 +751,9 @@ def chars():
     for k in range(24): t = k / 24 * 2 * math.pi; d.line([(31.5 + 7 * math.cos(t), 31.5 + 7 * math.sin(t)), (31.5 + 15 * math.cos(t), 31.5 + 15 * math.sin(t))], fill=(120, 90, 26))
     d.ellipse([24, 24, 39, 39], fill=(8, 6, 6)); d.ellipse([34, 22, 38, 26], fill=(250, 246, 236))
     save(A(im), 'T_CH_Eye', 'drawn eye (front projection): sclera, red veins, gold iris, pupil, highlight')
+    im = Image.new('RGB', (64, 64), (10, 9, 9)); d = ImageDraw.Draw(im)                # the Trader's eye deep in the hole
+    d.ellipse([14, 14, 49, 49], fill=(26, 24, 22)); d.ellipse([20, 20, 43, 43], outline=(150, 148, 136), width=2); d.ellipse([27, 27, 36, 36], fill=(2, 2, 2))
+    d.point([(34, 28), (35, 28)], fill=(230, 228, 214)); save(A(im), 'T_CH_HoleEye', 'drawn eye in the dark: black sclera, thin pale iris ring, pinpoint highlight')
     im = Image.new('RGB', (128, 64)); d = ImageDraw.Draw(im)
     for k, (val, bg, ink) in enumerate((('100', (176, 160, 120), (80, 60, 40)), ('50', (150, 156, 132), (50, 60, 50)), ('25', (164, 140, 160), (70, 40, 70)), ('10', (190, 140, 112), (100, 40, 30)))):
         x0, y0 = (k % 2) * 64, (k // 2) * 32; d.rectangle([x0, y0, x0 + 63, y0 + 31], fill=bg)

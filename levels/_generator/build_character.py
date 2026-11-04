@@ -6,7 +6,7 @@ Front = -y, feet at the origin, 1 unit = 1 m.
   Trader   - a shop assistant in a blue work coat with black sleeve protectors, long hands resting on a counter at 0.92 m
              (the Lift_Cab_Trader booth), a triangle for a head (Trader_Head pivots at the neck)
   Greed    - a 3.3 m red royal mantle with an ermine cape, one big eye for a head (Greed_Eye pivots at its centre), a crown of money"""
-import sys, os, math
+import sys, os, math, random
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 from kit import *
 NAME, OUT = sys.argv[-2], os.path.abspath(sys.argv[-1])
@@ -41,40 +41,73 @@ if NAME == 'MrNobody':
     IGN.append(o.name); ANCH = ['MrNobody_Body']
 
 # ================================================================ Trader
+def glow_x(name, tex, strength):
+    m = xm(tex).copy(); m.name = name; nt = m.node_tree; b = nt.nodes.get('Principled BSDF'); n = [x for x in nt.nodes if x.type == 'TEX_IMAGE'][0]
+    nt.links.new(n.outputs['Color'], b.inputs['Emission Color']); b.inputs['Emission Strength'].default_value = strength; ST['mats'][name] = m; ST['MS'][name] = None; return m
+def append(bm, tmp, M):
+    """add a temporary bmesh, transformed by M, to bm (materials kept)"""
+    bmesh.ops.transform(tmp, matrix=M, verts=tmp.verts[:]); me = bpy.data.meshes.new('_t'); tmp.to_mesh(me); tmp.free(); bm.from_mesh(me); bpy.data.meshes.remove(me)
+def hand(fl=(.17, .2, .19, .15), curl=0.0, mi=0):
+    """long-fingered hand: wrist at the origin, fingers along -y, palm on z = 0, back of the hand +z"""
+    h = bmesh.new(); wbox(h, (-.045, -.1, 0), (.045, 0, .025), mi)
+    for k, L_ in enumerate(fl):
+        x = -.033 + k * .022; a, b_ = L_ * .55, L_ * .45
+        wbox(h, (x - .0075, -.1005 - a, 0), (x + .0075, -.1005, .015), mi)
+        t = bmesh.new(); wbox(t, (-.007, -b_, 0), (.007, 0, .014), mi); append(h, t, Matrix.Translation((x, -.101 - a, .0005)) @ Matrix.Rotation(math.radians(-curl), 4, 'X'))
+    t = bmesh.new(); wbox(t, (-.008, -.12, 0), (.008, 0, .015), mi); append(h, t, Matrix.Translation((-.04, -.03, .002)) @ Matrix.Rotation(math.radians(35), 4, 'Z'))
+    return h
 if NAME == 'Trader':
-    HALAT = [(.5, 0, .25, .17), (.75, 0, .22, .15), (1.0, 0, .19, .13), (1.2, 0, .2, .135), (1.38, 0, .22, .14), (1.5, 0, .225, .13), (1.56, 0, .2, .12), (1.6, 0, .09, .08), (1.64, 0, .085, .075)]
-    bm = bmesh.new(); cup(bm, ell_rings(HALAT), .018, 0, 1, closed_first=False)
-    cyl(bm, (0, 0, 1.56), (0, 0, 1.72), .045, 10, 2)                                   # neck
-    for s in (-1, 1):
-        S_, E_, W_ = Vector((s * .215, 0, 1.47)), Vector((s * .26, -.12, 1.12)), Vector((s * .2, -.42, .94))
-        cuff = E_ + (W_ - E_) * .82
-        cup(bm, path_rings([tuple(S_), tuple(S_ + (E_ - S_) * .5), tuple(E_), tuple(E_ + (W_ - E_) * .5), tuple(cuff)], [.058, .056, .054, .05, .047], 10), .01, 0, 1)
-        cyl(bm, tuple(E_ + (W_ - E_) * .22), tuple(E_ + (W_ - E_) * .78), .056, 10, 4)                    # black sleeve protectors
-        cyl(bm, tuple(E_ + (W_ - E_) * .7), (s * .2, -.43, .935), .026, 8, 2)                              # wrist
-        B_ = lambda x0, y0, z0, x1, y1, z1: wbox(bm, (min(x0, x1), min(y0, y1), z0), (max(x0, x1), max(y0, y1), z1), 2)
-        B_(s * .2 - .042, -.42, .92, s * .2 + .042, -.51, .945)                                             # palm on the counter
-        for k in range(4):
-            fx = s * .2 - .0315 + k * .021; ln = (.13, .145, .14, .115)[k if s > 0 else 3 - k]
-            B_(fx - .0075, -.5105, .92, fx + .0075, -.51 - ln, .936)                                         # long fingers
-        B_(s * .2 - s * .05, -.44, .922, s * .2 - s * .036, -.53, .934)                                       # thumb
-        cyl(bm, (s * .09, 0, .075), (s * .09, 0, .85), .068, 10, 3)
-    for z in (1.4, 1.2, 1.0, .8): cyl(bm, (0, front_y(HALAT, z) + .004, z), (0, front_y(HALAT, z) - .006, z), .012, 8, 5)
-    wbox(bm, (.07, front_y(HALAT, 1.38) - .006, 1.37), (.15, front_y(HALAT, 1.38) + .01, 1.395), 5)          # name badge, blank
-    shoes(bm, 6, .09)
-    make('Trader_Body', bm, 'Trader', [tm('T_CH_Halat', (.5, .5)), VOID, flat('M_Skin_Grey', (.56, .53, .49), .7), flat('M_Trousers', (.05, .05, .055), .8),
-                                      flat('M_SleeveProtector', (.015, .015, .02), .35), flat('M_Button_White', (.8, .8, .76), .4), flat('M_Shoe', (.02, .015, .012), .35)])
-    bm = bmesh.new(); prism(bm, lambda p, q, a: (p, a, q), [(-.16, 0), (.16, 0), (0, .34)], -.03, .03, 0)
-    make('Trader_Head', bm, 'Trader', [flat('M_Triangle', (.86, .84, .78), .9)], loc=(0, 0, 1.72))
-    ANCH = ['Trader_Body']
+    C0, SIDE, RH, TY, NO = Vector((0, 0, 1.45)), .64, .075, .04, 30
+    HT_ = SIDE * math.sqrt(3) / 2; RIN = HT_ / 3
+    bm = bmesh.new(); ring = []
+    for k in range(NO):                                                        # triangle outline and the hole, sampled at the same angles
+        a = math.radians(90 + 360 * k / NO); d = Vector((math.cos(a), 0, math.sin(a)))
+        dist = RIN / max(math.cos(a - math.radians(na)) for na in (270, 30, 150)); ring.append((C0 + d * dist, C0 + d * RH))
+    Fo, Fi = [bm.verts.new(o + Vector((0, -TY, 0))) for o, _ in ring], [bm.verts.new(i_ + Vector((0, -TY, 0))) for _, i_ in ring]
+    Bo, Bi = [bm.verts.new(o + Vector((0, TY, 0))) for o, _ in ring], [bm.verts.new(i_ + Vector((0, TY, 0))) for _, i_ in ring]
+    for k in range(NO):
+        n = (k + 1) % NO
+        bm.faces.new((Fo[k], Fo[n], Fi[n], Fi[k])).material_index = 0; bm.faces.new((Bi[k], Bi[n], Bo[n], Bo[k])).material_index = 0
+        bm.faces.new((Fo[n], Fo[k], Bo[k], Bo[n])).material_index = 0; bm.faces.new((Fi[k], Fi[n], Bi[n], Bi[k])).material_index = 1
+    corners = [C0 + Vector((0, 0, 2 * RIN)), C0 + Vector((-SIDE / 2, 0, -RIN)), C0 + Vector((SIDE / 2, 0, -RIN))]
+    def arm(pts, radii, prot):
+        for i_, (p0, p1) in enumerate(zip(pts, pts[1:])):
+            cyl(bm, tuple(p0), tuple(p1), radii[i_], 8, 2, r1=radii[i_ + 1])
+            if i_ == prot: cyl(bm, tuple(p0.lerp(p1, .15)), tuple(p0.lerp(p1, .85)), radii[i_] + .012, 8, 3)
+        for p_ in pts[1:-1]: sphere(bm, tuple(p_), radii[0] + .006, 1, 2, 8, 5)
+    for s_ in (-1, 1):                                                         # two arms from the lower corners, hands flat on the counter (0.92 m)
+        P = [Vector(v) for v in ((s_ * .3, 0, 1.28), (s_ * .5, .02, 1.12), (s_ * .44, -.18, 1.3), (s_ * .3, -.46, 1.02), (s_ * .22, -.52, .955))]
+        arm(P, [.024, .021, .019, .017, .016], 2); sphere(bm, tuple(P[-1]), .024, 1, 2, 8, 5)
+        append(bm, hand(), Matrix.Translation((s_ * .22, -.5, .92)) @ Matrix.Rotation(math.radians(-8 * s_), 4, 'Z'))
+    P = [Vector(v) for v in ((0, 0, 1.8), (.04, .06, 2.0), (.06, -.2, 2.06), (.1, -.3, 1.76), (.14, -.3, 1.62))]   # third arm from the top corner, its hand hangs in front
+    arm(P, [.02, .018, .017, .016, .015], 1); sphere(bm, tuple(P[-1]), .022, 1, 2, 8, 5)
+    append(bm, hand((.15, .18, .17, .13), 28), Matrix.Translation((.14, -.31, 1.62)) @ Matrix.Rotation(math.radians(90), 4, 'X'))
+    for c_ in corners: c_ = c_ + (C0 - c_).normalized() * .03; cyl(bm, tuple(c_), (c_.x, c_.y, 2.25), .002, 4, 4)       # threads up to the booth ceiling
+    o = make('Trader', bm, 'Trader', [flat('M_Triangle', (.84, .82, .76), .9), VOID, flat('M_Skin_Grey', (.5, .48, .45), .7), flat('M_SleeveProtector', (.015, .015, .02), .35),
+                                     flat('M_Thread', (.02, .02, .02), .8)]); IGN.append(o.name)
+    bm = bmesh.new(); bmesh.ops.create_uvsphere(bm, u_segments=12, v_segments=8, radius=.066); uvl = bm.loops.layers.uv.new('UVMap')
+    for fc in bm.faces:
+        for lp in fc.loops: lp[uvl].uv = (.5 + lp.vert.co.x / .132, .5 + lp.vert.co.z / .132)
+    o = make('Trader_Eye', bm, 'Trader', [glow_x('M_CH_HoleEye_Glow', 'T_CH_HoleEye', .6)], loc=tuple(C0)); IGN.append(o.name)
 
 # ================================================================ Greed
+SPIKES = []
+def spike(bm, p, d, L_, b, mi):
+    """one tuft of fur: a four-sided pyramid from p along d (base sunk 2 cm into the surface)"""
+    if any((p - q).length < .032 for q in SPIKES): return
+    SPIKES.append(p.copy()); d = d.normalized(); u = d.cross(Vector((0, 0, 1)) if abs(d.z) < .9 else Vector((1, 0, 0))).normalized(); v = d.cross(u); u, v = v.cross(d).normalized(), v
+    if u.cross(v).dot(d) < 0: v = -v
+    base = p - d * .02; cs = [bm.verts.new(base + q * b) for q in (u, v, -u, -v)]; ap = bm.verts.new(p + d * L_)
+    for k in range(4): bm.faces.new((cs[k], cs[(k + 1) % 4], ap)).material_index = mi
+    bm.faces.new(cs[::-1]).material_index = mi
 if NAME == 'Greed':
     VEL, ERM, GOLD = tm('T_CH_Velvet', (.6, .6)), tm('T_CH_Ermine', (.22, .22)), flat('M_Gold', (.6, .42, .1), .3)
-    MZ = [(0, 1.05, .09, 22), (.15, 1.03, .088, 21), (.4, 1.0, .085, 18), (.9, .92, .07, 13), (1.4, .82, .05, 8), (1.9, .7, .03, 4), (2.25, .58, .015, 2), (2.4, .44, 0, 1.5)]
-    NA, TH_ = 44, .03; bm = bmesh.new()
-    def arc(z, R_, A_, gap, d=0.0):
-        a0, a1 = math.radians(-90 + gap), math.radians(270 - gap)
-        return [((R_ - d) * (1 + A_ * math.sin(9 * a)) * math.cos(a), (R_ - d) * (1 + A_ * math.sin(9 * a)) * math.sin(a), z + (d if z == 0 else 0)) for a in [a0 + (a1 - a0) * i / NA for i in range(NA + 1)]]
+    FURW, FURB = flat('M_Fur_White', (.8, .78, .72), 1.0), flat('M_Fur_Black', (.02, .02, .02), .9)
+    MZ = [(0, 1.05, .09, 5), (.15, 1.03, .088, 6), (.4, 1.0, .085, 9), (.9, .92, .07, 20), (1.2, .87, .06, 30), (1.45, .82, .05, 34), (1.7, .76, .04, 28),
+          (1.95, .69, .03, 14), (2.2, .6, .015, 4), (2.4, .44, 0, 1.5)]                       # z, radius, folds, half-width of the front opening (deg): an almond, like an eyelid
+    NA, TH_ = 44, .03; bm = bmesh.new(); RG = random.Random(7)
+    def ang(gap, i): a0, a1 = math.radians(-90 + gap), math.radians(270 - gap); return a0 + (a1 - a0) * i / NA
+    def arc(z, R0, A_, gap, d=0.0): return [((R0 - d) * (1 + A_ * math.sin(9 * a)) * math.cos(a), (R0 - d) * (1 + A_ * math.sin(9 * a)) * math.sin(a), z + (d if z == 0 else 0)) for a in [ang(gap, i) for i in range(NA + 1)]]
     O_ = [[bm.verts.new(p) for p in arc(*m)] for m in MZ]; I_ = [[bm.verts.new(p) for p in arc(*m, d=TH_)] for m in MZ]
     for j in range(len(MZ) - 1):
         for i in range(NA):
@@ -86,15 +119,37 @@ if NAME == 'Greed':
     for i in range(NA):
         bm.faces.new((I_[0][i], I_[0][i + 1], O_[0][i + 1], O_[0][i])).material_index = 1
         L_ = len(MZ) - 1; bm.faces.new((O_[L_][i], O_[L_][i + 1], I_[L_][i + 1], I_[L_][i])).material_index = 0
-    cape = [[(R_ * (1 + .03 * math.sin(7 * a)) * math.cos(a), R_ * (1 + .03 * math.sin(7 * a)) * math.sin(a), z) for a in [k / 32 * 2 * math.pi for k in range(32)]]
-            for z, R_ in ((2.12, .7), (2.3, .6), (2.47, .45), (2.58, .34), (2.63, .3))]
+    CAPE = ((2.12, .7), (2.3, .6), (2.47, .45), (2.58, .34), (2.63, .3))
+    cape = [[(R0 * (1 + .03 * math.sin(7 * a)) * math.cos(a), R0 * (1 + .03 * math.sin(7 * a)) * math.sin(a), z) for a in [k / 32 * 2 * math.pi for k in range(32)]] for z, R0 in CAPE]
     cup(bm, cape, .03, 1, 2, closed_first=False)
-    make('Greed_Mantle', bm, 'Greed', [VEL, ERM, VOID], recalc=False)
-    bm = bmesh.new(); res = bmesh.ops.create_uvsphere(bm, u_segments=16, v_segments=10, radius=.27); uvl = bm.loops.layers.uv.new('UVMap')
+    FM = lambda: 4 if RG.random() < .13 else 3                                            # white fur, some black ermine tails
+    for j in range(len(CAPE) - 1):                                                         # spiky fur over the cape
+        (za, ra), (zb, rb) = CAPE[j], CAPE[j + 1]
+        for k in range(int(math.pi * (ra + rb) * math.hypot(zb - za, ra - rb) / .006)):
+            t, a = RG.random(), RG.uniform(0, 2 * math.pi); z = za + (zb - za) * t; r0 = ra + (rb - ra) * t
+            p = Vector((r0 * math.cos(a), r0 * math.sin(a), z)); n = Vector((math.cos(a), math.sin(a), (ra - rb) / (zb - za)))
+            spike(bm, p, n.normalized() + Vector((RG.uniform(-.3, .3), RG.uniform(-.3, .3), -.55)), RG.uniform(.1, .2), RG.uniform(.028, .045), FM())
+    for zh in (.05, .13):                                                                  # two rows along the hem
+        for i in range(0, NA + 1):
+            for q in range(2):
+                a = ang(MZ[0][3], i + q * .5) if i + q * .5 <= NA else None
+                if a is None: continue
+                r0 = MZ[0][1] * (1 + MZ[0][2] * math.sin(9 * a)); p = Vector((r0 * math.cos(a), r0 * math.sin(a), zh))
+                spike(bm, p, Vector((math.cos(a), math.sin(a), -.5 + RG.uniform(-.2, .2))), RG.uniform(.09, .16), RG.uniform(.03, .045), FM())
+    for i_e in (0, NA):                                                                     # lashes along the almond opening
+        sgn = 1 if i_e == 0 else -1
+        for j in range(len(MZ) - 1):
+            if MZ[j + 1][0] > 2.0: continue
+            for q in range(5):
+                t = q / 5; zz = MZ[j][0] + (MZ[j + 1][0] - MZ[j][0]) * t
+                pa, pb = Vector(O_[j][i_e].co), Vector(O_[j + 1][i_e].co); p = pa.lerp(pb, t)
+                spike(bm, p, Vector((-sgn * .55, -1, RG.uniform(-.25, .25) + (.35 if zz > 1.45 else -.35))), RG.uniform(.1, .19), RG.uniform(.026, .04), FM())
+    make('Greed_Mantle', bm, 'Greed', [VEL, ERM, VOID, FURW, FURB], recalc=False)
+    bm = bmesh.new(); bmesh.ops.create_uvsphere(bm, u_segments=16, v_segments=10, radius=.3); uvl = bm.loops.layers.uv.new('UVMap')
     for fc in bm.faces:
-        for lp in fc.loops: lp[uvl].uv = (.5 + lp.vert.co.x / .54, .5 + lp.vert.co.z / .54)
-    o = make('Greed_Eye', bm, 'Greed', [xm('T_CH_Eye', rough=.15)], loc=(0, 0, 2.75)); IGN.append(o.name)
-    bm = bmesh.new(); zc = 3.06; band = [[(.19 * math.cos(a), .19 * math.sin(a), z) for a in [k / 24 * 2 * math.pi for k in range(24)]] for z in (zc, zc + .08)]
+        for lp in fc.loops: lp[uvl].uv = (.5 + lp.vert.co.x / .6, .5 + lp.vert.co.z / .6)
+    o = make('Greed_Eye', bm, 'Greed', [xm('T_CH_Eye', rough=.15)], loc=(0, -.32, 1.45)); IGN.append(o.name)          # looks out of the opening
+    bm = bmesh.new(); zc = 2.72; band = [[(.19 * math.cos(a), .19 * math.sin(a), z) for a in [k / 24 * 2 * math.pi for k in range(24)]] for z in (zc, zc + .08)]
     cup(bm, band, .015, 0, 0, closed_first=False); uvl = bm.loops.layers.uv.get('UVMap') or bm.loops.layers.uv.new('UVMap')
     for k in range(9):
         a = k / 9 * 2 * math.pi; c, s_ = math.cos(a), math.sin(a); cell = ((k % 2) * .5, (k // 2 % 2) * .5); tilt = math.radians(14)
