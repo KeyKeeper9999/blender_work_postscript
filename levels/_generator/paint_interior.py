@@ -671,14 +671,96 @@ def lift():
         if i not in (1, 4): d.rectangle([x, 111, x + 7, 124], fill=(226, 222, 206, 255)); d.line([(x + 3.5, 113), (x + 3.5, 122)], fill=(40, 40, 40, 255))
     save(im, 'T_LC_Decals', 'drawn decal atlas: marker tag, scratched heart, cigarette burns, advert sticker with tear-off strips')
 
+# ------------------------------------------------------------------ strange spaces (build_space.py)
+def space():
+    FS = lambda s: ImageFont.truetype(FONT, s); FR = lambda s: ImageFont.truetype(FONTR, s)
+    # wall of post office boxes: 8 x 16 doors per 256 px = 1.6 m (box UV, tiles); same font as the corridor mailboxes
+    r = random.Random(21); a = tint(photo('am__PaintedMetal007', 256, 256, 128), (92, 100, 96), contrast=.55)
+    im = I(a); d = ImageDraw.Draw(im, 'RGBA')
+    for j in range(16):
+        for i in range(8):
+            x0, y0 = i * 32, j * 16; sh = r.uniform(-14, 14)
+            d.rectangle([x0 + 1, y0 + 1, x0 + 30, y0 + 14], fill=(int(92 + sh), int(100 + sh), int(96 + sh), 70), outline=(26, 30, 30, 255))
+            q = r.random()
+            if q < .07: d.rectangle([x0 + 2, y0 + 2, x0 + 29, y0 + 13], fill=(8, 8, 9, 255)); d.rectangle([x0 + 5, y0 + 9, x0 + 22, y0 + 13], fill=(214, 206, 186, 255)); continue
+            d.rectangle([x0 + 4, y0 + 3, x0 + 18, y0 + 4], fill=(10, 10, 12, 255))
+            if q < .16: d.rectangle([x0 + 5, y0 + 1, x0 + 16, y0 + 4], fill=(222, 214, 194, 255)); d.line([(x0 + 6, y0 + 2), (x0 + 14, y0 + 2)], fill=(140, 60, 56, 255))
+            d.text((x0 + 24, y0 + 10), str(r.randint(10, 999)), font=FR(6), fill=(226, 224, 214, 210), anchor='mm'); d.point((x0 + 7, y0 + 10), fill=(12, 12, 12, 255))
+    a = A(im); m = (pnz(256, 256, 4, 22) > .7) & (pnz(256, 256, 32, 23) > .62); a[m] = a[m] * .45 + np.array([104, 54, 26]) * .55
+    save(a, 'T_SP_Mailboxes', 'ambientCG PaintedMetal007 graded + drawn post office box doors, slots, numbers, open boxes, letters, rust')
+    # mail sack canvas with a stencil
+    a = tint(photo('am__Fabric027', 64, 64, 64), (150, 140, 112), contrast=.5); im = I(a); d = ImageDraw.Draw(im, 'RGBA')
+    d.text((32, 26), 'ПОЧТА', font=FS(10), fill=(40, 40, 70, 170), anchor='mm'); d.text((32, 40), '№ 7', font=FS(8), fill=(40, 40, 70, 150), anchor='mm')
+    save(A(im), 'T_SP_Sack', 'ambientCG Fabric027 graded + drawn stencil')
+    # coat wool in three colours, fur for hats
+    for name, rgb in (('Grey', (88, 86, 82)), ('Brown', (86, 62, 44)), ('Navy', (40, 46, 62))):
+        save(tint(photo('am__Fabric043', 64, 64, 64), rgb, contrast=.5) * (.92 + .16 * pnz(64, 64, 8, len(name)))[..., None], f'T_SP_Wool_{name}', 'ambientCG Fabric043 graded (coat wool)')
+    save(tint(photo('am__Fabric044', 64, 64, 64), (92, 78, 62), contrast=1.2), 'T_SP_Fur', 'ambientCG Fabric044 graded (ushanka fur)')
+    # sign atlas 128 x 64: reception sign / keep quiet / office number
+    im = Image.new('RGB', (128, 64), (32, 56, 96)); d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, 127, 21], fill=(32, 56, 96)); d.rectangle([1, 1, 126, 20], outline=(220, 220, 210)); d.text((64, 11), 'РЕГИСТРАТУРА', font=FS(10), fill=(236, 236, 228), anchor='mm')
+    d.rectangle([0, 22, 127, 43], fill=(220, 214, 196)); d.text((64, 32), 'СОБЛЮДАЙТЕ ТИШИНУ', font=FS(8), fill=(140, 30, 24), anchor='mm')
+    d.rectangle([0, 44, 63, 63], fill=(214, 208, 190)); d.text((32, 54), 'КАБ.', font=FS(8), fill=(30, 30, 30), anchor='mm')
+    d.rectangle([64, 44, 127, 63], fill=(26, 26, 24)); d.text((96, 54), 'ВАШ №', font=FS(8), fill=(220, 120, 40), anchor='mm')
+    save(A(im) * (.92 + .1 * nz(128, 64, 4, 24))[..., None], 'T_SP_Signs', 'drawn signs: reception, keep quiet, office plate, queue number')
+
+# ------------------------------------------------------------------ character prototypes (build_character.py)
+def chars():
+    r = random.Random(31)
+    save(tint(photo('am__Fabric043', 64, 64, 64), (34, 34, 36), contrast=.6), 'T_CH_Wool_Black', 'ambientCG Fabric043 graded (Mr. Nobody coat)')
+    a = tint(photo('am__Fabric005', 64, 64, 64), (52, 74, 120), contrast=.6) * (.9 + .2 * pnz(64, 64, 8, 32))[..., None]
+    save(a, 'T_CH_Halat', 'ambientCG Fabric005 graded (blue shop assistant coat)')
+    a = tint(photo('am__Fabric026', 64, 64, 64), (120, 14, 18), contrast=.5) * (.75 + .45 * pnz(64, 64, 16, 33) ** 1.5)[..., None]
+    save(a, 'T_CH_Velvet', 'ambientCG Fabric026 graded deep red + soft fold sheen')
+    a = tint(photo('am__Fabric019', 64, 64, 64), (226, 220, 204), contrast=.6); im = I(a); d = ImageDraw.Draw(im)
+    for j in range(4):
+        for i in range(4):
+            x, y = i * 16 + (8 if j % 2 else 0) + r.uniform(-1, 1), j * 16 + 6 + r.uniform(-1, 1)
+            for dx in (-64, 0, 64): d.polygon([(x + dx - 2, y - 3), (x + dx + 2, y - 3), (x + dx + 1, y + 4), (x + dx, y + 6), (x + dx - 1, y + 4)], fill=(16, 14, 14))
+    save(A(im), 'T_CH_Ermine', 'ambientCG Fabric019 graded + drawn black ermine tails')
+    yy, xx = np.mgrid[0:64, 0:64].astype(float); rr = np.hypot(xx - 31.5, yy - 31.5)
+    a = np.zeros((64, 64, 3)) + np.array([222, 214, 196]); a *= (1 - .25 * np.clip(rr / 32, 0, 1) ** 2)[..., None]
+    im = I(a); d = ImageDraw.Draw(im)
+    for k in range(18):                                                     # red veins creeping in from the edge
+        ang = r.uniform(0, 2 * math.pi); pts = []; rad = 31
+        for s in range(6): rad -= r.uniform(2, 3.5); ang += r.uniform(-.25, .25); pts.append((31.5 + rad * math.cos(ang), 31.5 + rad * math.sin(ang)))
+        d.line(pts, fill=(150, 36, 30))
+    d.ellipse([15, 15, 48, 48], fill=(150, 118, 34)); d.ellipse([18, 18, 45, 45], fill=(176, 140, 46))
+    for k in range(24): t = k / 24 * 2 * math.pi; d.line([(31.5 + 7 * math.cos(t), 31.5 + 7 * math.sin(t)), (31.5 + 15 * math.cos(t), 31.5 + 15 * math.sin(t))], fill=(120, 90, 26))
+    d.ellipse([24, 24, 39, 39], fill=(8, 6, 6)); d.ellipse([34, 22, 38, 26], fill=(250, 246, 236))
+    save(A(im), 'T_CH_Eye', 'drawn eye (front projection): sclera, red veins, gold iris, pupil, highlight')
+    im = Image.new('RGB', (128, 64)); d = ImageDraw.Draw(im)
+    for k, (val, bg, ink) in enumerate((('100', (176, 160, 120), (80, 60, 40)), ('50', (150, 156, 132), (50, 60, 50)), ('25', (164, 140, 160), (70, 40, 70)), ('10', (190, 140, 112), (100, 40, 30)))):
+        x0, y0 = (k % 2) * 64, (k // 2) * 32; d.rectangle([x0, y0, x0 + 63, y0 + 31], fill=bg)
+        d.rectangle([x0 + 2, y0 + 2, x0 + 61, y0 + 29], outline=ink)
+        for i in range(0, 58, 4): d.arc([x0 + 3 + i, y0 + 3, x0 + 7 + i, y0 + 7], 0, 180, fill=ink); d.arc([x0 + 3 + i, y0 + 24, x0 + 7 + i, y0 + 28], 180, 360, fill=ink)
+        d.ellipse([x0 + 38, y0 + 8, x0 + 54, y0 + 24], outline=ink); d.ellipse([x0 + 42, y0 + 12, x0 + 50, y0 + 20], fill=tuple(int(c * .8) for c in bg))
+        d.text((x0 + 18, y0 + 16), val, font=ImageFont.truetype(FONT, 11), fill=ink, anchor='mm'); d.text((x0 + 18, y0 + 25), 'РУБЛЕЙ', font=ImageFont.truetype(FONTR, 5), fill=ink, anchor='mm')
+    a = A(im) * (.88 + .2 * nz(128, 64, 4, 34))[..., None]; save(a, 'T_CH_Money', 'drawn generic banknotes atlas (2 x 2): ornament, value, oval')
+    yy, xx = np.mgrid[0:64, 0:64].astype(float); t = yy / 63                 # v: base (bottom row) -> tip (top row)
+    base = np.array([150, 160, 110]) * (1 - t[..., None]) ** 2 + np.array([232, 218, 214]) * (1 - (1 - t[..., None]) ** 2)
+    a = base * (.92 + .1 * nz(64, 64, 4, 35))[..., None]; im = I(a[::-1]); d = ImageDraw.Draw(im)
+    for k in range(5): x = 12 + k * 10; d.line([(32, 63), (x, 6 + abs(k - 2) * 4)], fill=(196, 176, 176))
+    save(A(im), 'T_CH_Petal', 'drawn petal: green base to pale tip, veins')
+    a = np.zeros((64, 64, 3)) + np.array([52, 84, 40]); a *= (.85 + .25 * nz(64, 64, 4, 36))[..., None]; a[:, 31:33] = (110, 140, 70)
+    im = I(a); d = ImageDraw.Draw(im)
+    for k in range(7): y = 8 + k * 8; d.line([(32, y + 6), (4, y)], fill=(80, 112, 56)); d.line([(32, y + 6), (60, y)], fill=(80, 112, 56))
+    save(A(im), 'T_CH_Leaf', 'drawn leaf: midrib and veins (u across, v along)')
+    im = Image.new('RGB', (32, 32), (60, 44, 20)); d = ImageDraw.Draw(im)
+    for k in range(90):
+        t_ = k * 2.39996; rad = 1.5 * math.sqrt(k); d.point((16 + rad * math.cos(t_), 16 + rad * math.sin(t_)), fill=(150, 120, 40) if k % 3 else (30, 22, 10))
+    save(A(im), 'T_CH_FlowerDisk', 'drawn seed disk (phyllotaxis)')
+
 def finish():
     md = os.path.join(OUT, 'SOURCES.md'); s = open(md).read(); names = {r.split('|')[1].strip() for r in ROWS}
     s = '\n'.join(l for l in s.split('\n') if not (l.startswith('| ') and l.split('|')[1].strip() in names)).rstrip('\n')
     open(md, 'w').write(s + '\n' + '\n'.join(ROWS) + '\n'); print('painted', len(ROWS))
 
 if __name__ == '__main__':
-    which = sys.argv[1:] or ['corridor', 'apartment', 'lift']
+    which = sys.argv[1:] or ['corridor', 'apartment', 'lift', 'space', 'chars']
     if 'corridor' in which: corridors()
     if 'apartment' in which: apartment()
     if 'lift' in which: lift()
+    if 'space' in which: space()
+    if 'chars' in which: chars()
     finish()

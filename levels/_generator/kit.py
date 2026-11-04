@@ -171,6 +171,33 @@ def rot_into(wf, ang, hinge_low=True):
     for a in (abs(ang), -abs(ang)):
         if (Matrix.Rotation(math.radians(a), 3, 'Z') @ d0).dot(n) > 0: return math.radians(a)
 
+# ---------------------------------------------------------------- thick shells (coats, sleeves, mantles)
+def path_rings(pts, radii, n=8, flat_=1.0):
+    out = []
+    for i, p in enumerate(pts):
+        p = Vector(p); a = Vector(pts[max(i - 1, 0)]); b = Vector(pts[min(i + 1, len(pts) - 1)]); t = (b - a).normalized()
+        u = t.cross(Vector((0, 0, 1))); u = u.normalized() if u.length > 1e-4 else Vector((1, 0, 0)); v = u.cross(t)
+        out.append([tuple(p + radii[i] * (math.cos(2 * math.pi * k / n) * u + flat_ * math.sin(2 * math.pi * k / n) * v)) for k in range(n)])
+    return out
+def cup(bm, rings, th, mo=0, mi=1, closed_first=True):
+    """thick shell from rings (first ring closed with a cap when closed_first, last ring open), outer mo, inner mi"""
+    def inset(r, d):
+        c = sum((Vector(p) for p in r), Vector()) / len(r); return [tuple(c + (Vector(p) - c) * max(.05, 1 - d / max(1e-6, (Vector(p) - c).length))) for p in r]
+    inner = [inset(r, th) for r in rings]
+    if closed_first:
+        c0 = sum((Vector(p) for p in rings[0]), Vector()) / len(rings[0]); c1 = sum((Vector(p) for p in rings[1]), Vector()) / len(rings[1])
+        inner[0] = [tuple(Vector(p) + (c1 - c0).normalized() * th) for p in inner[0]]
+    O = [[bm.verts.new(p) for p in r] for r in rings]; Iv = [[bm.verts.new(p) for p in r] for r in inner]; n = len(rings[0])
+    for A_, B_ in zip(O, O[1:]):
+        for i in range(n): bm.faces.new((A_[i], A_[(i + 1) % n], B_[(i + 1) % n], B_[i])).material_index = mo
+    for A_, B_ in zip(Iv, Iv[1:]):
+        for i in range(n): bm.faces.new((B_[i], B_[(i + 1) % n], A_[(i + 1) % n], A_[i])).material_index = mi
+    L_ = len(rings) - 1
+    for i in range(n): bm.faces.new((O[L_][i], O[L_][(i + 1) % n], Iv[L_][(i + 1) % n], Iv[L_][i])).material_index = mo
+    if closed_first: bm.faces.new(O[0][::-1]).material_index = mo; bm.faces.new(Iv[0]).material_index = mi
+    else:
+        for i in range(n): bm.faces.new((Iv[0][i], Iv[0][(i + 1) % n], O[0][(i + 1) % n], O[0][i])).material_index = mo
+
 # ---------------------------------------------------------------- rooms -> wall segments
 def wall_segments(rooms):
     """inner wall runs of a union of rectangles: [(wf, u0, u1)]"""

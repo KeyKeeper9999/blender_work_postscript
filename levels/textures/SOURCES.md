@@ -263,3 +263,19 @@ Unity: Filter Mode = Point, Compression = None, Generate Mip Maps off (or on, fo
 | T_LC_DoorMetal.png | 64x256 | cgbookcase PaintedMetal01 graded + drawn scratches, kick marks, marker scribble |
 | T_LC_Vent.png | 64x32 | ambientCG Metal009 graded + drawn figured vent cut-outs, dust |
 | T_LC_Decals.png | 128x128 | drawn decal atlas: marker tag, scratched heart, cigarette burns, advert sticker with tear-off strips |
+| T_SP_Mailboxes.png | 256x256 | ambientCG PaintedMetal007 graded + drawn post office box doors, slots, numbers, open boxes, letters, rust |
+| T_SP_Sack.png | 64x64 | ambientCG Fabric027 graded + drawn stencil |
+| T_SP_Wool_Grey.png | 64x64 | ambientCG Fabric043 graded (coat wool) |
+| T_SP_Wool_Brown.png | 64x64 | ambientCG Fabric043 graded (coat wool) |
+| T_SP_Wool_Navy.png | 64x64 | ambientCG Fabric043 graded (coat wool) |
+| T_SP_Fur.png | 64x64 | ambientCG Fabric044 graded (ushanka fur) |
+| T_SP_Signs.png | 128x64 | drawn signs: reception, keep quiet, office plate, queue number |
+| T_CH_Wool_Black.png | 64x64 | ambientCG Fabric043 graded (Mr. Nobody coat) |
+| T_CH_Halat.png | 64x64 | ambientCG Fabric005 graded (blue shop assistant coat) |
+| T_CH_Velvet.png | 64x64 | ambientCG Fabric026 graded deep red + soft fold sheen |
+| T_CH_Ermine.png | 64x64 | ambientCG Fabric019 graded + drawn black ermine tails |
+| T_CH_Eye.png | 64x64 | drawn eye (front projection): sclera, red veins, gold iris, pupil, highlight |
+| T_CH_Money.png | 128x64 | drawn generic banknotes atlas (2 x 2): ornament, value, oval |
+| T_CH_Petal.png | 64x64 | drawn petal: green base to pale tip, veins |
+| T_CH_Leaf.png | 64x64 | drawn leaf: midrib and veins (u across, v along) |
+| T_CH_FlowerDisk.png | 32x32 | drawn seed disk (phyllotaxis) |

@@ -46,10 +46,15 @@ Where they differ, this file wins for Postscript. Read once per chat before mode
 - Apartments: everything under sheets with the mirror covered and letters covering the floor (the player is a
   postman), furniture on the ceiling, a hallway that keeps going.
 - Broken lift with doors ajar over an empty shaft, dead and flickering lamps, a lone chair facing something.
+- Spaces that cannot fit: a post hall of numberless boxes, a queue of empty coats, a room inside itself, all the kitchens of
+  the stairwell stacked without floors. Built from the same everyday props, only the arrangement or the scale is wrong.
+- Characters stay readable as silhouettes at low resolution: Mr. Nobody = coat + floating hat, Trader = work coat + flat
+  triangle, Greed = red bell + eye + crown, Flower = a person-high stem with a face-sized bloom. Insides are pure black.
 
 ## Sizes used (1 unit = 1 m)
 - Storey: ceiling 2.6 (interiors), 2.8 floor-to-floor on the 9-storey facade, 2.7 on the 5-storey; 3 m facade bays.
 - Corridor 2 m wide; apartment door opening 0.94 x 2.07; interior door 0.8 x 2.0; window sill 0.85-0.9.
+- Characters: Mr. Nobody 2.07 m with the hat, Trader 2.06 m to the triangle tip (hands at 0.92 m), Greed 3.3 m, Flower 1.75 m.
 - Lift cab inside 1.5 x 1.3 x 2.25 m (Trader version 2.2 x 2.6), telescopic doors 1.0 x 2.05, button plate 0.92-1.48 m.
 - Lift doors 1.0 m wide in the v2 floors (real Soviet 320-500 kg lifts: ~0.7 m, dnaop.com; Key found 0.8 m too
   narrow in game).
